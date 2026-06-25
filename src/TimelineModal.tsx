@@ -23,6 +23,8 @@ export interface TimelineLogEntry {
     content: string; // Mapped to "제목" (Title) - matches category name
     todoId?: number; // Linked To-Do item ID
     notes?: string;  // Mapped to "내용" (Content - Notes)
+    // 현재는 카테고리명을 노출하는데 나중에 필요 시 입력한 제목이 노출되도록 한다
+    title?: string;
 }
 
 export interface TimelineTodoItem {
@@ -78,9 +80,7 @@ export const TimelineModalComponent: React.FC<TimelineModalComponentProps> = ({
     const [color, setColor] = useState(logEntry ? logEntry.color : (categories[0]?.color || DEFAULT_CATEGORIES[0].color));
     
     // Linked Todo state
-    const [linkedTodoId, setLinkedTodoId] = useState<number | null>(
-        logEntry?.todoId || initialTodoId || null
-    );
+    const linkedTodoId = logEntry?.todoId || initialTodoId || null;
 
     // Find the linked todo if exists
     const linkedTodo = linkedTodoId ? todos.find(t => t.id === linkedTodoId) : null;
@@ -89,7 +89,7 @@ export const TimelineModalComponent: React.FC<TimelineModalComponentProps> = ({
 
     // Focus with a small timeout to bypass Obsidian's modal initialization race condition
     useEffect(() => {
-        const timer = setTimeout(() => {
+        const timer = window.setTimeout(() => {
             if (textareaRef.current) {
                 textareaRef.current.focus();
                 // Move cursor to the end of text
@@ -98,7 +98,7 @@ export const TimelineModalComponent: React.FC<TimelineModalComponentProps> = ({
             }
         }, 50);
 
-        return () => clearTimeout(timer);
+        return () => window.clearTimeout(timer);
     }, []);
 
     const handleSave = () => {
@@ -133,6 +133,11 @@ export const TimelineModalComponent: React.FC<TimelineModalComponentProps> = ({
         if (notes.trim()) {
             newEntry.notes = notes.trim();
         }
+
+        // 나중에 제목 입력 필드를 추가하면 아래처럼 title을 채운다.
+        // if (title.trim()) {
+        //     newEntry.title = title.trim();
+        // }
 
         onSave(newEntry);
     };

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
-import { App, TFile, Notice, FileSystemAdapter, Modal } from "obsidian";
+import { App, TFile, Notice, Modal, Events } from "obsidian";
 import DayTimeTrackerPlugin from "./main";
 import { TimelineLogEntry, TimelineModal, TimelineTodoItem, getCategoryLabel } from "./TimelineModal";
 import { t } from "./locale/helpers";
@@ -33,6 +33,18 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
         return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
     }
 
+    // Array.isArray narrows `unknown` to `any[]` in TypeScript, so this wraps
+    // it back into `unknown[]` to keep downstream spreads/filters type-safe.
+    function toUnknownArray(value: unknown): unknown[] {
+        return Array.isArray(value) ? (value as unknown[]) : [];
+    }
+
+    // FrontMatterCache is typed as `{ [key: string]: any }`, so this narrows
+    // it to `Record<string, unknown>` to keep downstream access type-safe.
+    function toRecord(value: unknown): Record<string, unknown> | undefined {
+        return value && typeof value === "object" ? (value as Record<string, unknown>) : undefined;
+    }
+
     function getTextColorForBackground(hexColor: string): string {
         if (!hexColor) return "#ffffff";
         const color = hexColor.startsWith("#") ? hexColor.substring(1) : hexColor;
@@ -48,7 +60,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
         const baseName = fileName.endsWith(".md") ? fileName.slice(0, -3) : fileName;
         const match = baseName.match(/^(\d{4})-(\d{2})-(\d{2})$/);
         if (match) {
-            const [_, y, m, d] = match;
+        const [, y, m, d] = match;
             const date = new Date(parseInt(y, 10), parseInt(m, 10) - 1, parseInt(d, 10));
             if (!isNaN(date.getTime())) {
                 const lang = settings.language;
@@ -81,17 +93,23 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
     // Load logs and todos from frontmatter
     const loadLogs = (file: TFile) => {
         const cache = plugin.app.metadataCache.getFileCache(file);
-        const frontmatter = cache?.frontmatter;
+        const frontmatter = toRecord(cache?.frontmatter);
         
         // Load logs
         const rawLogs = frontmatter?.["timeline-logs"];
         if (Array.isArray(rawLogs)) {
             const filtered = rawLogs.filter(
-                (log): log is TimelineLogEntry =>
-                    log &&
-                    log.type === "daytime-tracker" &&
-                    typeof log.start === "string" &&
-                    typeof log.end === "string"
+                (log): log is TimelineLogEntry => {
+                    if (log && typeof log === "object") {
+                        const l = log as Record<string, unknown>;
+                        return (
+                            l.type === "daytime-tracker" &&
+                            typeof l.start === "string" &&
+                            typeof l.end === "string"
+                        );
+                    }
+                    return false;
+                }
             );
             filtered.sort((a, b) => timeToMinutes(a.start) - timeToMinutes(b.start));
             setLogs(filtered);
@@ -103,11 +121,17 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
         const rawTodos = frontmatter?.["timeline-todos"];
         if (Array.isArray(rawTodos)) {
             const filteredTodos = rawTodos.filter(
-                (todo): todo is TimelineTodoItem =>
-                    todo &&
-                    typeof todo.id === "number" &&
-                    typeof todo.content === "string" &&
-                    typeof todo.checked === "boolean"
+                (todo): todo is TimelineTodoItem => {
+                    if (todo && typeof todo === "object") {
+                        const t = todo as Record<string, unknown>;
+                        return (
+                            typeof t.id === "number" &&
+                            typeof t.content === "string" &&
+                            typeof t.checked === "boolean"
+                        );
+                    }
+                    return false;
+                }
             );
             setTodos(filteredTodos);
         } else {
@@ -156,7 +180,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
         const handleSettingsChanged = () => {
             setSettings({ ...plugin.settings });
         };
-        const ref = plugin.app.workspace.on("daytime-tracker:settings-changed" as any, handleSettingsChanged);
+        const ref = (plugin.app.workspace as Events).on("daytime-tracker:settings-changed", handleSettingsChanged);
         return () => {
             plugin.app.workspace.offref(ref);
         };
@@ -179,11 +203,16 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
     const handleSave = async (newEntry: TimelineLogEntry, editIndex?: number) => {
         if (!activeFile) return;
 
-        await plugin.app.fileManager.processFrontMatter(activeFile, (frontmatter) => {
-            const rawLogs = frontmatter["timeline-logs"] || [];
-            const otherLogs = Array.isArray(rawLogs)
-                ? rawLogs.filter((log: any) => !log || log.type !== "daytime-tracker")
-                : [];
+        await plugin.app.fileManager.processFrontMatter(activeFile, (fm) => {
+            const frontmatter = fm as Record<string, unknown>;
+            const rawLogs = frontmatter["timeline-logs"];
+            const otherLogs = toUnknownArray(rawLogs).filter((log) => {
+                if (log && typeof log === "object") {
+                    const l = log as Record<string, unknown>;
+                    return l.type !== "daytime-tracker";
+                }
+                return true;
+            });
 
             const currentOurLogs = [...logs];
             if (editIndex !== undefined && editIndex >= 0 && editIndex < currentOurLogs.length) {
@@ -202,11 +231,16 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
     const handleDelete = async (editIndex: number) => {
         if (!activeFile) return;
 
-        await plugin.app.fileManager.processFrontMatter(activeFile, (frontmatter) => {
-            const rawLogs = frontmatter["timeline-logs"] || [];
-            const otherLogs = Array.isArray(rawLogs)
-                ? rawLogs.filter((log: any) => !log || log.type !== "daytime-tracker")
-                : [];
+        await plugin.app.fileManager.processFrontMatter(activeFile, (fm) => {
+            const frontmatter = fm as Record<string, unknown>;
+            const rawLogs = frontmatter["timeline-logs"];
+            const otherLogs = toUnknownArray(rawLogs).filter((log) => {
+                if (log && typeof log === "object") {
+                    const l = log as Record<string, unknown>;
+                    return l.type !== "daytime-tracker";
+                }
+                return true;
+            });
 
             const currentOurLogs = logs.filter((_, idx) => idx !== editIndex);
             frontmatter["timeline-logs"] = [...otherLogs, ...currentOurLogs];
@@ -224,8 +258,9 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
             return;
         }
 
-        await plugin.app.fileManager.processFrontMatter(activeFile, (frontmatter) => {
-            const currentTodos = frontmatter["timeline-todos"] || [];
+        await plugin.app.fileManager.processFrontMatter(activeFile, (fm) => {
+            const frontmatter = fm as Record<string, unknown>;
+            const currentTodos = (frontmatter["timeline-todos"] || []) as unknown[];
             const newTodo: TimelineTodoItem = {
                 id: Date.now(),
                 content: trimmed,
@@ -250,49 +285,63 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
                 plugin.app,
                 t("CONFIRM_RECORD_TIMELINE", settings.language),
                 settings.language,
-                async () => {
+                () => {
                     // On confirm, check To-Do and open TimelineModal
-                    await plugin.app.fileManager.processFrontMatter(activeFile, (frontmatter) => {
-                        const currentTodos = frontmatter["timeline-todos"] || [];
-                        frontmatter["timeline-todos"] = currentTodos.map((t: any) => {
-                            if (t && t.id === todoId) {
-                                return { ...t, checked: true };
-                            }
-                            return t;
+                    void (async () => {
+                        await plugin.app.fileManager.processFrontMatter(activeFile, (fm) => {
+                            const frontmatter = fm as Record<string, unknown>;
+                            const currentTodos = (frontmatter["timeline-todos"] || []) as unknown[];
+                            frontmatter["timeline-todos"] = currentTodos.map((t) => {
+                                if (t && typeof t === "object") {
+                                    const todoItem = t as Record<string, unknown>;
+                                    if (todoItem.id === todoId) {
+                                        return { ...todoItem, checked: true };
+                                    }
+                                }
+                                return t;
+                            });
                         });
-                    });
 
-                    const now = new Date();
-                    const h = now.getHours();
-                    const startTimeStr = `${String(h).padStart(2, "0")}:00`;
-                    const endTimeStr = `${String(h === 23 ? 24 : h + 1).padStart(2, "0")}:00`;
+                        const now = new Date();
+                        const h = now.getHours();
+                        const startTimeStr = `${String(h).padStart(2, "0")}:00`;
+                        const endTimeStr = `${String(h === 23 ? 24 : h + 1).padStart(2, "0")}:00`;
 
-                    const modal = new TimelineModal(
-                        plugin.app,
-                        null,
-                        startTimeStr,
-                        endTimeStr,
-                        todos, 
-                        todoId,
-                        todo.content,
-                        settings.language,
-                        settings.categories,
-                        (newEntry) => handleSave(newEntry)
-                    );
-                    modal.open();
+                        const modal = new TimelineModal(
+                            plugin.app,
+                            null,
+                            startTimeStr,
+                            endTimeStr,
+                            todos, 
+                            todoId,
+                            todo.content,
+                            settings.language,
+                            settings.categories,
+                            (newEntry) => {
+                                void handleSave(newEntry);
+                            }
+                        );
+                        modal.open();
+                    })();
                 },
-                async () => {
+                () => {
                     // On cancel, just check To-Do without logging
-                    await plugin.app.fileManager.processFrontMatter(activeFile, (frontmatter) => {
-                        const currentTodos = frontmatter["timeline-todos"] || [];
-                        frontmatter["timeline-todos"] = currentTodos.map((t: any) => {
-                            if (t && t.id === todoId) {
-                                return { ...t, checked: true };
-                            }
-                            return t;
+                    void (async () => {
+                        await plugin.app.fileManager.processFrontMatter(activeFile, (fm) => {
+                            const frontmatter = fm as Record<string, unknown>;
+                            const currentTodos = (frontmatter["timeline-todos"] || []) as unknown[];
+                            frontmatter["timeline-todos"] = currentTodos.map((t) => {
+                                if (t && typeof t === "object") {
+                                    const todoItem = t as Record<string, unknown>;
+                                    if (todoItem.id === todoId) {
+                                        return { ...todoItem, checked: true };
+                                    }
+                                }
+                                return t;
+                            });
                         });
-                    });
-                    loadLogs(activeFile);
+                        loadLogs(activeFile);
+                    })();
                 }
             );
             confirmModal.open();
@@ -304,62 +353,86 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
                     plugin.app,
                     t("CONFIRM_DELETE_LINKED_LOG", settings.language),
                     settings.language,
-                    async () => {
+                    () => {
                         // On confirm, uncheck To-Do and delete log block
-                        await plugin.app.fileManager.processFrontMatter(activeFile, (frontmatter) => {
-                            const currentTodos = frontmatter["timeline-todos"] || [];
-                            frontmatter["timeline-todos"] = currentTodos.map((t: any) => {
-                                if (t && t.id === todoId) {
-                                    return { ...t, checked: false };
-                                }
-                                return t;
-                            });
+                        void (async () => {
+                            await plugin.app.fileManager.processFrontMatter(activeFile, (fm) => {
+                                const frontmatter = fm as Record<string, unknown>;
+                                const currentTodos = (frontmatter["timeline-todos"] || []) as unknown[];
+                                frontmatter["timeline-todos"] = currentTodos.map((t) => {
+                                    if (t && typeof t === "object") {
+                                        const todoItem = t as Record<string, unknown>;
+                                        if (todoItem.id === todoId) {
+                                            return { ...todoItem, checked: false };
+                                        }
+                                    }
+                                    return t;
+                                });
 
-                            const rawLogs = frontmatter["timeline-logs"] || [];
-                            const otherLogs = Array.isArray(rawLogs)
-                                ? rawLogs.filter((log: any) => !log || log.type !== "daytime-tracker")
-                                : [];
-                            
-                            const currentOurLogs = logs.filter((_, idx) => idx !== linkedLogIndex);
-                            frontmatter["timeline-logs"] = [...otherLogs, ...currentOurLogs];
-                        });
-                        loadLogs(activeFile);
+                                const rawLogs = frontmatter["timeline-logs"];
+                                const otherLogs = toUnknownArray(rawLogs).filter((log) => {
+                                    if (log && typeof log === "object") {
+                                        const l = log as Record<string, unknown>;
+                                        return l.type !== "daytime-tracker";
+                                    }
+                                    return true;
+                                });
+
+                                const currentOurLogs = logs.filter((_, idx) => idx !== linkedLogIndex);
+                                frontmatter["timeline-logs"] = [...otherLogs, ...currentOurLogs];
+                            });
+                            loadLogs(activeFile);
+                        })();
                     },
-                    async () => {
+                    () => {
                         // On cancel, uncheck To-Do but keep log block (severing link)
-                        await plugin.app.fileManager.processFrontMatter(activeFile, (frontmatter) => {
-                            const currentTodos = frontmatter["timeline-todos"] || [];
-                            frontmatter["timeline-todos"] = currentTodos.map((t: any) => {
-                                if (t && t.id === todoId) {
-                                    return { ...t, checked: false };
-                                }
-                                return t;
-                            });
+                        void (async () => {
+                            await plugin.app.fileManager.processFrontMatter(activeFile, (fm) => {
+                                const frontmatter = fm as Record<string, unknown>;
+                                const currentTodos = (frontmatter["timeline-todos"] || []) as unknown[];
+                                frontmatter["timeline-todos"] = currentTodos.map((t) => {
+                                    if (t && typeof t === "object") {
+                                        const todoItem = t as Record<string, unknown>;
+                                        if (todoItem.id === todoId) {
+                                            return { ...todoItem, checked: false };
+                                        }
+                                    }
+                                    return t;
+                                });
 
-                            const rawLogs = frontmatter["timeline-logs"] || [];
-                            const otherLogs = Array.isArray(rawLogs)
-                                ? rawLogs.filter((log: any) => !log || log.type !== "daytime-tracker")
-                                : [];
-                            
-                            const currentOurLogs = [...logs];
-                            if (currentOurLogs[linkedLogIndex]) {
-                                const updatedLog = { ...currentOurLogs[linkedLogIndex] };
-                                delete updatedLog.todoId;
-                                currentOurLogs[linkedLogIndex] = updatedLog;
-                            }
-                            frontmatter["timeline-logs"] = [...otherLogs, ...currentOurLogs];
-                        });
-                        loadLogs(activeFile);
+                                const rawLogs = frontmatter["timeline-logs"];
+                                const otherLogs = toUnknownArray(rawLogs).filter((log) => {
+                                    if (log && typeof log === "object") {
+                                        const l = log as Record<string, unknown>;
+                                        return l.type !== "daytime-tracker";
+                                    }
+                                    return true;
+                                });
+
+                                const currentOurLogs = [...logs];
+                                if (currentOurLogs[linkedLogIndex]) {
+                                    const updatedLog = { ...currentOurLogs[linkedLogIndex] };
+                                    delete updatedLog.todoId;
+                                    currentOurLogs[linkedLogIndex] = updatedLog;
+                                }
+                                frontmatter["timeline-logs"] = [...otherLogs, ...currentOurLogs];
+                            });
+                            loadLogs(activeFile);
+                        })();
                     }
                 );
                 confirmModal.open();
             } else {
                 // Just uncheck To-Do
-                await plugin.app.fileManager.processFrontMatter(activeFile, (frontmatter) => {
-                    const currentTodos = frontmatter["timeline-todos"] || [];
-                    frontmatter["timeline-todos"] = currentTodos.map((t: any) => {
-                        if (t && t.id === todoId) {
-                            return { ...t, checked: false };
+                await plugin.app.fileManager.processFrontMatter(activeFile, (fm) => {
+                    const frontmatter = fm as Record<string, unknown>;
+                    const currentTodos = (frontmatter["timeline-todos"] || []) as unknown[];
+                    frontmatter["timeline-todos"] = currentTodos.map((t) => {
+                        if (t && typeof t === "object") {
+                            const todoItem = t as Record<string, unknown>;
+                            if (todoItem.id === todoId) {
+                                return { ...todoItem, checked: false };
+                            }
                         }
                         return t;
                     });
@@ -381,12 +454,21 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
             plugin.app,
             message,
             settings.language,
-            async () => {
-                await plugin.app.fileManager.processFrontMatter(activeFile, (frontmatter) => {
-                    const currentTodos = frontmatter["timeline-todos"] || [];
-                    frontmatter["timeline-todos"] = currentTodos.filter((t: any) => t && t.id !== todoId);
-                });
-                loadLogs(activeFile);
+            () => {
+                void (async () => {
+                    await plugin.app.fileManager.processFrontMatter(activeFile, (fm) => {
+                        const frontmatter = fm as Record<string, unknown>;
+                        const currentTodos = (frontmatter["timeline-todos"] || []) as unknown[];
+                        frontmatter["timeline-todos"] = currentTodos.filter((t) => {
+                            if (t && typeof t === "object") {
+                                const todoItem = t as Record<string, unknown>;
+                                return todoItem.id !== todoId;
+                            }
+                            return true;
+                        });
+                    });
+                    loadLogs(activeFile);
+                })();
             }
         );
         confirmModal.open();
@@ -428,7 +510,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
             "",
             settings.language,
             settings.categories,
-            (newEntry) => handleSave(newEntry)
+            (newEntry) => { void handleSave(newEntry); }
         );
         modal.open();
 
@@ -447,8 +529,8 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
             "",
             settings.language,
             settings.categories,
-            (updatedEntry) => handleSave(updatedEntry, index),
-            () => handleDelete(index)
+            (updatedEntry) => { void handleSave(updatedEntry, index); },
+            () => { void handleDelete(index); }
         );
         modal.open();
     };
@@ -484,7 +566,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
         if (!activeFile) return;
 
         // Detect theme mode
-        let isDark = document.body.classList.contains("theme-dark");
+        let isDark = activeDocument.body.classList.contains("theme-dark");
         if (settings.themeMode === "light") {
             isDark = false;
         } else if (settings.themeMode === "dark") {
@@ -532,7 +614,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
                 });
 
             let logBlocksHtml = "";
-            for (const { log, index } of overlappingLogs) {
+            for (const { log } of overlappingLogs) {
                 const startMin = timeToMinutes(log.start);
                 const endMin = timeToMinutes(log.end);
 
@@ -547,14 +629,16 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
 
                 const catObj = settings.categories.find(c => c.name === log.category);
                 const displayTitle = catObj ? getCategoryLabel(catObj, settings.language) : log.category;
+                // 나중에 제목 입력 기능을 활성화하면 카테고리명 대신 입력한 제목을 우선 노출:
+                // const displayTitle = log.title?.trim() || (catObj ? getCategoryLabel(catObj, settings.language) : log.category);
                 const linkedTodo = log.todoId ? todos.find(t => t.id === log.todoId) : null;
-                
+
                 const tooltipText = `${log.start} ~ ${log.end} | ${displayTitle}${log.notes ? `\n${settings.language === "ko" ? "내용" : "Content"}: ${log.notes}` : ""}${linkedTodo ? `\n${settings.language === "ko" ? "연계된 할 일" : "Linked To-Do"}: ${linkedTodo.content}` : ""}`;
 
                 const isShortBlock = (overlapEnd - overlapStart) <= 10;
                 logBlocksHtml += `
                     <div class="timeline-log-block" style="left: ${leftPercent}%; width: ${widthPercent}%; background-color: ${log.color}; color: ${getTextColorForBackground(log.color)};" title="${tooltipText.replace(/"/g, '&quot;')}">
-                        ${isShortBlock ? `${displayTitle} (..)` : `${displayTitle} (${log.start}-${log.end})`}
+                        <strong>${displayTitle}</strong>${isShortBlock ? " (..)" : ` (${log.start}-${log.end})`}
                     </div>
                 `;
             }
@@ -744,7 +828,6 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
             z-index: 10;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
             box-sizing: border-box;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
             border: 1px solid rgba(0, 0, 0, 0.1);
         }
 
@@ -897,15 +980,18 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
         const exportFileName = `Timeline-Export-${activeFile.basename}.html`;
         
         let file = plugin.app.vault.getAbstractFileByPath(exportFileName);
-        if (file) {
-            await plugin.app.vault.modify(file as TFile, htmlContent);
-        } else {
+        if (file instanceof TFile) {
+            await plugin.app.vault.modify(file, htmlContent);
+        } else if (!file) {
             file = await plugin.app.vault.create(exportFileName, htmlContent);
         }
 
         if (file instanceof TFile) {
             // Open in default browser/app
-            (plugin.app as any).openWithDefaultApp(file.path);
+            const appWithDefaultApp = plugin.app as { openWithDefaultApp?: (path: string) => void };
+            if (typeof appWithDefaultApp.openWithDefaultApp === "function") {
+                appWithDefaultApp.openWithDefaultApp(file.path);
+            }
             new Notice(t("EXPORT_SUCCESS", settings.language));
         }
     };
@@ -916,7 +1002,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
             <div className="daytime-tracker-empty">
                 <h3>{t("NO_NOTE_OPEN", settings.language)}</h3>
                 <p>{t("NO_NOTE_OPEN_DESC", settings.language)}</p>
-                <button onClick={createTodaysNote} style={{ marginTop: "16px" }}>
+                <button onClick={() => { void createTodaysNote(); }} style={{ marginTop: "16px" }}>
                     {t("CREATE_TODAYS_NOTE", settings.language)}
                 </button>
             </div>
@@ -943,10 +1029,10 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
                 <div className="daytime-tracker-header">
                     <h2 className="daytime-tracker-title">{dateHeader}</h2>
                     <div style={{ display: "flex", gap: "6px" }}>
-                        <button onClick={exportToPDF} title={t("EXPORT_PDF_DESC", settings.language)}>
+                        <button onClick={() => { void exportToPDF(); }} title={t("EXPORT_PDF_DESC", settings.language)}>
                             {t("EXPORT_PDF", settings.language)}
                         </button>
-                        <button onClick={createTodaysNote} title={t("CREATE_TODAYS_NOTE", settings.language)}>
+                        <button onClick={() => { void createTodaysNote(); }} title={t("CREATE_TODAYS_NOTE", settings.language)}>
                             {t("TODAYS_NOTE", settings.language)}
                         </button>
                     </div>
@@ -1012,8 +1098,10 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
 
                                             const catObj = settings.categories.find(c => c.name === log.category);
                                             const displayTitle = catObj ? getCategoryLabel(catObj, settings.language) : log.category;
+                                            // 나중에 제목 입력 기능을 활성화하면 카테고리명 대신 입력한 제목을 우선 노출:
+                                            // const displayTitle = log.title?.trim() || (catObj ? getCategoryLabel(catObj, settings.language) : log.category);
                                             const linkedTodo = log.todoId ? todos.find(t => t.id === log.todoId) : null;
-                                            
+
                                             const tooltipText = `${log.start} ~ ${log.end} | ${displayTitle}${log.notes ? `\n${settings.language === "ko" ? "내용" : "Content"}: ${log.notes}` : ""}${linkedTodo ? `\n${settings.language === "ko" ? "연계된 할 일" : "Linked To-Do"}: ${linkedTodo.content}` : ""}`;
 
                                             return (
@@ -1035,7 +1123,8 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
                                                     }}
                                                     title={tooltipText}
                                                 >
-                                                    {(overlapEnd - overlapStart) <= 10 ? `${displayTitle} (..)` : `${displayTitle} (${log.start}-${log.end})`}
+                                                    <strong>{displayTitle}</strong>
+                                                    {(overlapEnd - overlapStart) <= 10 ? " (..)" : ` (${log.start}-${log.end})`}
                                                 </div>
                                             );
                                         })}
@@ -1072,7 +1161,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
                                     e.stopPropagation();
                                     if (e.key === "Enter") {
                                         const target = e.currentTarget;
-                                        handleAddTodo(target.value);
+                                        void handleAddTodo(target.value);
                                         target.value = "";
                                     }
                                 }}
@@ -1085,14 +1174,14 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
                                         type="checkbox"
                                         className="timeline-todo-checkbox"
                                         checked={todo.checked}
-                                        onChange={() => handleToggleTodo(todo.id)}
+                                        onChange={() => { void handleToggleTodo(todo.id); }}
                                     />
                                     <span className="timeline-todo-text" title={todo.content}>
                                         {todo.content}
                                     </span>
                                     <button
                                         className="timeline-todo-delete-btn"
-                                        onClick={() => handleDeleteTodo(todo.id)}
+                                        onClick={() => { void handleDeleteTodo(todo.id); }}
                                         title={t("DELETE_TODO", settings.language)}
                                     >
                                         ✕
@@ -1137,15 +1226,19 @@ class ConfirmModal extends Modal {
         const p = contentEl.createEl("p", { 
             text: this.message
         });
-        p.style.marginBottom = "20px";
-        p.style.fontSize = "14px";
-        p.style.lineHeight = "1.5";
-        p.style.color = "var(--text-normal)";
+        p.setCssStyles({
+            marginBottom: "20px",
+            fontSize: "14px",
+            lineHeight: "1.5",
+            color: "var(--text-normal)"
+        });
 
         const btnContainer = contentEl.createDiv();
-        btnContainer.style.display = "flex";
-        btnContainer.style.justifyContent = "flex-end";
-        btnContainer.style.gap = "8px";
+        btnContainer.setCssStyles({
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: "8px"
+        });
 
         const cancelBtn = btnContainer.createEl("button", {
             text: this.language === "ko" ? "취소" : "Cancel"

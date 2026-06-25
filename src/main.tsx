@@ -1,9 +1,9 @@
-import { App, Plugin, PluginSettingTab, Setting, WorkspaceLeaf, ItemView, Notice } from "obsidian";
+import { App, Plugin, PluginSettingTab, Setting, WorkspaceLeaf, ItemView, Notice, getLanguage } from "obsidian";
 import * as React from "react";
 import { createRoot, Root } from "react-dom/client";
 import { TimelineView } from "./TimelineView";
 import { t } from "./locale/helpers";
-import { DEFAULT_CATEGORIES, getCategoryLabel, CustomCategory } from "./TimelineModal";
+import { DEFAULT_CATEGORIES, CustomCategory } from "./TimelineModal";
 
 export const TIMELINE_VIEW_TYPE = "daytime-tracker-view";
 
@@ -40,15 +40,15 @@ export default class DayTimeTrackerPlugin extends Plugin {
 
         // Add a ribbon icon to open the timeline
         this.addRibbonIcon("calendar-clock", "DayTime Tracker", () => {
-            this.activateView();
+            void this.activateView();
         });
 
         // Add a command to open the timeline
         this.addCommand({
-            id: "open-daytime-tracker",
-            name: "Open DayTime Tracker View",
+            id: "open-timeline",
+            name: "Open timeline",
             callback: () => {
-                this.activateView();
+                void this.activateView();
             },
         });
 
@@ -56,17 +56,16 @@ export default class DayTimeTrackerPlugin extends Plugin {
         this.addSettingTab(new DayTimeTrackerSettingTab(this.app, this));
     }
 
-    async onunload() {
-        // Cleanup views on unload
-        this.app.workspace.detachLeavesOfType(TIMELINE_VIEW_TYPE);
+    onunload() {
         // Clean up global body class
-        document.body.classList.remove("daytime-tracker-hide-properties");
+        activeDocument.body.classList.remove("daytime-tracker-hide-properties");
     }
 
     async loadSettings() {
-        this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+        const savedData = (await this.loadData()) as Partial<DayTimeTrackerSettings> | null;
+        this.settings = Object.assign({}, DEFAULT_SETTINGS, savedData);
         if (!this.settings.language) {
-            const obsidianLang = window.localStorage.getItem("language") || "en";
+            const obsidianLang = getLanguage() || "en";
             this.settings.language = (obsidianLang === "ko") ? "ko" : "en";
             await this.saveSettings();
         }
@@ -109,9 +108,9 @@ export default class DayTimeTrackerPlugin extends Plugin {
 
     updatePropertiesBlockClass() {
         if (this.settings.hidePropertiesBlock) {
-            document.body.classList.add("daytime-tracker-hide-properties");
+            activeDocument.body.classList.add("daytime-tracker-hide-properties");
         } else {
-            document.body.classList.remove("daytime-tracker-hide-properties");
+            activeDocument.body.classList.remove("daytime-tracker-hide-properties");
         }
     }
 
@@ -136,7 +135,7 @@ export default class DayTimeTrackerPlugin extends Plugin {
         }
 
         if (leaf) {
-            workspace.revealLeaf(leaf);
+            void workspace.revealLeaf(leaf);
         }
     }
 }
@@ -204,8 +203,14 @@ class DayTimeTrackerSettingTab extends PluginSettingTab {
 
         const lang = this.plugin.settings.language;
 
-        containerEl.createEl("h2", { text: t("SETTINGS_TITLE", lang), cls: "daytime-settings-main-title" });
-        containerEl.createEl("h3", { text: t("SETTING_GENERAL_SECTION", lang) });
+        const mainTitleSetting = new Setting(containerEl)
+            .setName(t("SETTINGS_TITLE", lang))
+            .setHeading();
+        mainTitleSetting.settingEl.addClass("daytime-settings-main-title");
+
+        new Setting(containerEl)
+            .setName(t("SETTING_GENERAL_SECTION", lang))
+            .setHeading();
 
         const formatHourOption = (h: number): string => {
             if (h === 0) return lang === "ko" ? "오전 12시 (00:00)" : "12 AM (00:00)";
@@ -300,23 +305,27 @@ class DayTimeTrackerSettingTab extends PluginSettingTab {
             });
 
         // Categories Management Section
-        containerEl.createEl("h3", { text: t("SETTING_CATEGORIES_SECTION", lang) });
+        new Setting(containerEl)
+            .setName(t("SETTING_CATEGORIES_SECTION", lang))
+            .setHeading();
         
         const categoriesDesc = containerEl.createEl("p", { 
             text: t("SETTING_CATEGORIES_DESC", lang),
             cls: "daytime-tracker-settings-desc"
         });
-        categoriesDesc.style.fontSize = "var(--font-ui-smaller)";
-        categoriesDesc.style.color = "var(--text-muted)";
-        categoriesDesc.style.marginTop = "0px";
-        categoriesDesc.style.marginBottom = "12px";
+        categoriesDesc.setCssStyles({
+            fontSize: "var(--font-ui-smaller)",
+            color: "var(--text-muted)",
+            marginTop: "0px",
+            marginBottom: "12px"
+        });
 
         new Setting(containerEl)
             .setName(lang === "ko" ? "기본 카테고리 색상 재설정" : "Reset Default Categories")
             .setDesc(lang === "ko" ? "카테고리와 색상을 원래의 파스텔톤 기본값으로 재설정합니다." : "Reset all categories and colors to the default pastel values.")
             .addButton((btn) => {
                 btn.setButtonText(lang === "ko" ? "재설정" : "Reset")
-                    .setWarning()
+                    .setDestructive()
                     .onClick(async () => {
                         this.plugin.settings.categories = [...DEFAULT_CATEGORIES];
                         await this.plugin.saveSettings();
@@ -345,7 +354,7 @@ class DayTimeTrackerSettingTab extends PluginSettingTab {
                        await this.plugin.saveSettings();
                    });
                 txt.inputEl.maxLength = 10;
-                txt.inputEl.style.width = "190px";
+                txt.inputEl.setCssStyles({ width: "190px" });
             });
 
             // Color picker
@@ -361,7 +370,7 @@ class DayTimeTrackerSettingTab extends PluginSettingTab {
             if (!isDefaultCat) {
                 settingRow.addButton((btn) => {
                     btn.setButtonText("X")
-                        .setWarning()
+                        .setDestructive()
                         .onClick(async () => {
                             this.plugin.settings.categories.splice(idx, 1);
                             await this.plugin.saveSettings();
