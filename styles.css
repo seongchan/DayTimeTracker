@@ -1,0 +1,804 @@
+/* Hide timeline-logs property from Obsidian's native properties editor */
+[data-property-key="timeline-logs"] {
+    display: none !important;
+}
+
+/* Hide the entire properties block when the setting is enabled */
+body.daytime-tracker-hide-properties .metadata-container {
+    display: none !important;
+}
+
+/* DayTime Tracker Styles */
+
+.daytime-tracker-view-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--background-primary);
+    color: var(--text-normal);
+    font-family: var(--font-interface);
+}
+
+.daytime-tracker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--background-secondary);
+}
+
+.daytime-tracker-title {
+    font-size: 1.2em;
+    font-weight: 600;
+    color: var(--text-title);
+    margin: 0;
+}
+
+.daytime-tracker-body {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: auto;
+    padding: 16px;
+}
+
+.daytime-tracker-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-muted);
+    font-style: italic;
+    text-align: center;
+    padding: 32px;
+}
+
+.timeline-grid {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid rgba(128, 128, 128, 0.15);
+    border-left: 1px solid rgba(128, 128, 128, 0.15);
+    border-radius: 4px;
+    overflow: hidden;
+    min-width: 280px;
+}
+
+.timeline-row {
+    display: flex;
+    height: 36px;
+    align-items: stretch;
+}
+
+.timeline-hour-label {
+    width: 50px;
+    min-width: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 8px;
+    font-size: 11px;
+    color: var(--text-muted);
+    border-bottom: 1px solid rgba(128, 128, 128, 0.15);
+    background-color: var(--background-primary-alt);
+    user-select: none;
+}
+
+.timeline-cells {
+    flex: 1;
+    display: flex;
+    position: relative;
+    user-select: none;
+}
+
+.timeline-cell {
+    flex: 1;
+    border-right: 1px solid rgba(128, 128, 128, 0.15);
+    border-bottom: 1px solid rgba(128, 128, 128, 0.15);
+    box-sizing: border-box;
+    cursor: crosshair;
+    transition: background-color 0.1s ease;
+}
+
+.timeline-cell:hover {
+    background-color: var(--background-modifier-hover);
+}
+
+.timeline-cell.is-selecting {
+    background-color: var(--text-accent-hover);
+    opacity: 0.4;
+}
+
+/* Log Block Styling */
+.timeline-log-block {
+    position: absolute;
+    height: calc(100% - 6px);
+    top: 3px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 500;
+    color: #ffffff;
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 0 6px;
+    z-index: 10;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    box-sizing: border-box;
+    transition: transform 0.1s ease, filter 0.1s ease;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    /* Horizontal margins/spacing using transparent borders */
+    border-left: 2px solid transparent !important;
+    border-right: 2px solid transparent !important;
+    background-clip: padding-box !important;
+}
+
+.timeline-log-block:hover {
+    transform: scaleY(1.04);
+    filter: brightness(1.1);
+}
+
+/* Modal Styling overrides/additions */
+.timeline-modal-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 8px 0;
+}
+
+.timeline-modal-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.timeline-modal-field label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.timeline-modal-time-inputs {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.timeline-modal-time-inputs input {
+    flex: 1;
+}
+
+.timeline-modal-container input[type="text"],
+.timeline-modal-container textarea {
+    background-color: var(--background-modifier-form-field);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 8px 12px;
+    color: var(--text-normal);
+    font-size: 13px;
+    font-family: inherit;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.timeline-modal-container textarea {
+    resize: vertical;
+    min-height: 80px;
+    max-height: 300px;
+}
+
+.timeline-modal-container input[type="text"]:focus,
+.timeline-modal-container textarea:focus {
+    border-color: var(--interactive-accent);
+    box-shadow: 0 0 0 2px var(--background-modifier-border-focus);
+    outline: none;
+}
+
+.timeline-modal-linked-todo-text {
+    font-size: 13px;
+    color: var(--text-normal);
+    padding: 8px 12px;
+    background-color: var(--background-secondary);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    font-weight: 500;
+}
+
+.timeline-modal-color-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.timeline-modal-color-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    border: 2px solid transparent;
+    transition: all 0.15s ease;
+    background-color: var(--background-secondary);
+}
+
+.timeline-modal-color-chip.is-selected {
+    border-color: var(--text-accent);
+    transform: scale(1.05);
+}
+
+.timeline-modal-color-preview {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.timeline-modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.timeline-modal-buttons button.is-delete {
+    margin-right: auto;
+    background-color: var(--background-modifier-error);
+    color: var(--text-on-accent);
+}
+
+.timeline-modal-buttons button.is-delete:hover {
+    background-color: var(--background-modifier-error-hover);
+}
+
+/* Custom modal layout overrides (forcing white background and black/dark titles) */
+.timeline-custom-modal-container {
+    background-color: rgba(0, 0, 0, 0.45) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.timeline-custom-modal-container .modal {
+    background-color: #ffffff !important;
+    color: #111111 !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+    max-width: 400px !important;
+    width: 90% !important;
+    padding: 24px !important;
+    box-sizing: border-box !important;
+}
+
+.timeline-custom-modal-container .modal-title {
+    color: #000000 !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    margin-top: 0 !important;
+    margin-bottom: 16px !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    padding-bottom: 12px !important;
+    text-align: left !important;
+}
+
+/* Modals content/forms inside white modals */
+.timeline-custom-modal-container .timeline-modal-container input[type="text"],
+.timeline-custom-modal-container .timeline-modal-container textarea {
+    background-color: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #333333 !important;
+    border-radius: 6px !important;
+}
+
+.timeline-custom-modal-container .timeline-modal-container input[type="text"]::placeholder,
+.timeline-custom-modal-container .timeline-modal-container textarea::placeholder {
+    color: #94a3b8 !important;
+}
+
+.timeline-custom-modal-container .timeline-modal-container input[type="text"]:focus,
+.timeline-custom-modal-container .timeline-modal-container textarea:focus {
+    border-color: #94a3b8 !important;
+    box-shadow: 0 0 0 2px rgba(148, 163, 184, 0.15) !important;
+}
+
+/* Modal category chip overrides */
+.timeline-custom-modal-container .timeline-modal-color-chip {
+    background-color: #f1f5f9 !important;
+    color: #334155 !important;
+    border: 2px solid transparent !important;
+}
+
+.timeline-custom-modal-container .timeline-modal-color-chip.is-selected {
+    border-color: #64748b !important;
+    background-color: #e2e8f0 !important;
+}
+
+/* Modal linked to-do block background */
+.timeline-custom-modal-container .timeline-modal-linked-todo-text {
+    background-color: #f8fafc !important;
+    border-color: #e2e8f0 !important;
+    color: #334155 !important;
+}
+
+/* Modal text paragraph style in ConfirmModal */
+.timeline-custom-modal-container p {
+    color: #334155 !important;
+}
+
+/* Modal field labels (시간 설정, 카테고리, 내용) - force identical dark color */
+.timeline-custom-modal-container label {
+    color: #111111 !important;
+    font-weight: 600 !important;
+}
+
+/* Modal buttons styling (flat transparent with borders) */
+.timeline-custom-modal-container button {
+    font-size: 13px !important;
+    padding: 6px 12px !important;
+    border-radius: 6px !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    transition: background-color 0.15s ease, border-color 0.15s ease !important;
+    outline: none !important;
+    background-color: transparent !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #475569 !important;
+    box-shadow: none !important; /* Remove native shadow effects */
+}
+
+/* Primary/Confirm button (e.g. Save, Confirm) */
+.timeline-custom-modal-container button.mod-cta {
+    border: 1px solid #64748b !important;
+    color: #1e293b !important;
+    box-shadow: none !important;
+}
+
+.timeline-custom-modal-container button.mod-cta:hover {
+    background-color: #cbd5e1 !important;
+}
+
+/* Secondary/Cancel button */
+.timeline-custom-modal-container button:not(.mod-cta):not(.is-delete):hover {
+    background-color: #f1f5f9 !important;
+}
+
+/* Delete button */
+.timeline-custom-modal-container button.is-delete {
+    border: 1px solid #fca5a5 !important;
+    color: #991b1b !important;
+    margin-right: auto !important;
+}
+
+.timeline-custom-modal-container button.is-delete:hover {
+    background-color: #fee2e2 !important;
+}
+
+/* Header and empty state button styling (Light Theme default matching mockup) */
+.theme-light .daytime-tracker-header button,
+.daytime-tracker-view-root.theme-force-light .daytime-tracker-header button,
+.daytime-tracker-header button {
+    background-color: #ffffff !important;
+    color: #475569 !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 4px !important;
+    padding: 6px 10px !important;
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    transition: all 0.1s ease !important;
+    box-shadow: none !important;
+}
+
+.theme-light .daytime-tracker-header button:hover,
+.daytime-tracker-view-root.theme-force-light .daytime-tracker-header button:hover,
+.daytime-tracker-header button:hover {
+    background-color: #f1f5f9 !important;
+    color: #1e293b !important;
+}
+
+/* Ensure buttons are styled correctly in dark mode */
+.theme-dark .daytime-tracker-view-root:not(.theme-force-light) .daytime-tracker-header button,
+.theme-force-dark .daytime-tracker-header button {
+    background-color: #2d3748 !important;
+    color: #cbd5e1 !important;
+    border: 1px solid #4a5568 !important;
+}
+
+.theme-dark .daytime-tracker-view-root:not(.theme-force-light) .daytime-tracker-header button:hover,
+.theme-force-dark .daytime-tracker-header button:hover {
+    background-color: #4a5568 !important;
+    color: #ffffff !important;
+}
+
+.daytime-tracker-empty button {
+    background-color: var(--background-modifier-border);
+    color: var(--text-normal);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+}
+
+.daytime-tracker-empty button:hover {
+    background-color: var(--background-modifier-hover);
+}
+
+/* To-Do Section Styling */
+.timeline-todos-container {
+    border-top: 1px solid var(--border-color);
+    background-color: var(--background-primary-alt);
+    display: flex;
+    flex-direction: column;
+}
+
+.timeline-todos-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px;
+    background-color: var(--background-secondary-alt);
+    cursor: pointer;
+    user-select: none;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.timeline-todos-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-title);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.timeline-todos-count {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: normal;
+}
+
+.timeline-todos-toggle-icon {
+    font-size: 10px;
+    color: var(--text-muted);
+    transition: transform 0.15s ease;
+}
+
+.timeline-todos-toggle-icon.is-collapsed {
+    transform: rotate(-90deg);
+}
+
+.timeline-todos-body {
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.timeline-todos-input-wrapper {
+    display: flex;
+    gap: 8px;
+}
+
+.timeline-todos-input-wrapper input {
+    flex: 1;
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    background-color: var(--background-primary);
+}
+
+.timeline-todos-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.timeline-todo-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    padding: 4px 6px;
+    border-radius: 4px;
+    transition: background-color 0.1s ease;
+}
+
+.timeline-todo-item:hover {
+    background-color: var(--background-modifier-hover);
+}
+
+.timeline-todo-item.is-checked .timeline-todo-text {
+    text-decoration: line-through;
+    color: var(--text-muted);
+}
+
+.timeline-todo-checkbox {
+    cursor: pointer;
+}
+
+.timeline-todo-text {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.timeline-todo-delete-btn {
+    border: none !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    color: var(--text-muted) !important;
+    font-size: 12px;
+    padding: 2px 6px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.1s ease, color 0.1s ease;
+}
+
+.timeline-todo-item:hover .timeline-todo-delete-btn,
+.timeline-todo-delete-btn:focus {
+    opacity: 1;
+}
+
+.timeline-todo-delete-btn:hover,
+.timeline-todo-delete-btn:focus,
+.timeline-todo-delete-btn:active {
+    color: #ef4444 !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* Modal Todo Suggestions */
+.timeline-modal-suggestions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.timeline-modal-suggestion-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    max-height: 100px;
+    overflow-y: auto;
+    padding: 2px;
+}
+
+.timeline-modal-suggestion-chip {
+    font-size: 11px;
+    padding: 4px 8px;
+    background-color: var(--background-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.1s ease, border-color 0.1s ease;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.timeline-modal-suggestion-chip:hover {
+    background-color: var(--background-modifier-hover);
+    border-color: var(--text-accent);
+}
+
+/* Print CSS */
+@media print {
+    .daytime-tracker-header {
+        background-color: transparent !important;
+        border-bottom: 2px solid #000000 !important;
+    }
+
+    .daytime-tracker-body {
+        overflow: visible !important;
+        padding: 0 !important;
+    }
+
+    .timeline-grid {
+        border-top: 2px solid #000000 !important;
+        border-left: 2px solid #000000 !important;
+    }
+
+    .timeline-hour-label {
+        background-color: transparent !important;
+        border-bottom: 1px solid #000000 !important;
+        color: #000000 !important;
+    }
+
+    .timeline-cell {
+        border-right: 1px solid #000000 !important;
+        border-bottom: 1px solid #000000 !important;
+    }
+
+    .timeline-log-block {
+        box-shadow: none !important;
+        border: 1px solid rgba(0,0,0,0.2) !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}
+
+/* Force Light / Paper White Theme overrides */
+.daytime-tracker-view-root.theme-force-light {
+    background-color: #ffffff !important;
+    color: #111111 !important;
+}
+.daytime-tracker-view-root.theme-force-light .daytime-tracker-header,
+.daytime-tracker-view-root.theme-force-light .timeline-todos-header {
+    background-color: #f7f7f7 !important;
+    border-color: #e5e5e5 !important;
+}
+.daytime-tracker-view-root.theme-force-light .daytime-tracker-title,
+.daytime-tracker-view-root.theme-force-light .timeline-todos-title,
+.daytime-tracker-view-root.theme-force-light .timeline-todo-text {
+    color: #111111 !important;
+}
+.daytime-tracker-view-root.theme-force-light .timeline-grid,
+.daytime-tracker-view-root.theme-force-light .timeline-row,
+.daytime-tracker-view-root.theme-force-light .timeline-cell,
+.daytime-tracker-view-root.theme-force-light .timeline-hour-label {
+    border-color: rgba(0, 0, 0, 0.06) !important;
+}
+.daytime-tracker-view-root.theme-force-light .timeline-hour-label {
+    background-color: #fafafa !important;
+    color: #666666 !important;
+}
+.daytime-tracker-view-root.theme-force-light .timeline-cell:hover {
+    background-color: #f0f0f0 !important;
+}
+.daytime-tracker-view-root.theme-force-light .timeline-todos-container {
+    background-color: #ffffff !important;
+    border-color: #e5e5e5 !important;
+}
+.daytime-tracker-view-root.theme-force-light .timeline-todos-input-wrapper input {
+    background-color: #ffffff !important;
+    border-color: #cccccc !important;
+    color: #111111 !important;
+}
+.daytime-tracker-view-root.theme-force-light .timeline-todos-input-wrapper input::placeholder {
+    color: #999999 !important;
+}
+.daytime-tracker-view-root.theme-force-light .timeline-todo-item:hover {
+    background-color: #f5f5f5 !important;
+}
+.daytime-tracker-view-root.theme-force-light .daytime-tracker-empty {
+    background-color: #ffffff !important;
+    color: #666666 !important;
+}
+
+/* Force Dark / Digital Dark Theme overrides */
+.daytime-tracker-view-root.theme-force-dark {
+    background-color: #1a1a1a !important;
+    color: #e0e0e0 !important;
+}
+.daytime-tracker-view-root.theme-force-dark .daytime-tracker-header,
+.daytime-tracker-view-root.theme-force-dark .timeline-todos-header {
+    background-color: #242424 !important;
+    border-color: #333333 !important;
+}
+.daytime-tracker-view-root.theme-force-dark .daytime-tracker-title,
+.daytime-tracker-view-root.theme-force-dark .timeline-todos-title,
+.daytime-tracker-view-root.theme-force-dark .timeline-todo-text {
+    color: #e0e0e0 !important;
+}
+.daytime-tracker-view-root.theme-force-dark .timeline-grid,
+.daytime-tracker-view-root.theme-force-dark .timeline-row,
+.daytime-tracker-view-root.theme-force-dark .timeline-cell,
+.daytime-tracker-view-root.theme-force-dark .timeline-hour-label {
+    border-color: #333333 !important;
+}
+.daytime-tracker-view-root.theme-force-dark .timeline-hour-label {
+    background-color: #202020 !important;
+    color: #aaaaaa !important;
+}
+.daytime-tracker-view-root.theme-force-dark .timeline-cell:hover {
+    background-color: #2a2a2a !important;
+}
+.daytime-tracker-view-root.theme-force-dark .timeline-todos-container {
+    background-color: #1a1a1a !important;
+    border-color: #333333 !important;
+}
+.daytime-tracker-view-root.theme-force-dark .timeline-todos-input-wrapper input {
+    background-color: #242424 !important;
+    border-color: #444444 !important;
+    color: #e0e0e0 !important;
+}
+.daytime-tracker-view-root.theme-force-dark .timeline-todos-input-wrapper input::placeholder {
+    color: #777777 !important;
+}
+.daytime-tracker-view-root.theme-force-dark .timeline-todo-item:hover {
+    background-color: #2d2d2d !important;
+}
+.daytime-tracker-view-root.theme-force-dark .daytime-tracker-empty {
+    background-color: #1a1a1a !important;
+    color: #aaaaaa !important;
+}
+
+/* DayTime Tracker Settings compact styling */
+.daytime-tracker-settings .setting-item {
+    padding: 6px 16px 6px 16px !important;
+    border-bottom: 1px dashed rgba(128, 128, 128, 0.15) !important;
+}
+.daytime-tracker-settings .setting-item-name {
+    font-size: 13px !important;
+    font-weight: 500 !important;
+}
+.daytime-tracker-settings .setting-item-description {
+    font-size: 11px !important;
+    color: var(--text-muted) !important;
+}
+.daytime-tracker-settings input[type="text"] {
+    font-size: 11px !important;
+    padding: 4px 6px !important;
+    height: 26px !important;
+}
+.daytime-tracker-settings .setting-item-control {
+    gap: 4px !important;
+}
+.daytime-tracker-settings h2,
+.daytime-tracker-settings h3 {
+    margin-top: 14px !important;
+    margin-bottom: 6px !important;
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+}
+
+.daytime-tracker-settings h3 {
+    font-size: 16px !important;
+}
+
+.daytime-settings-main-title {
+    font-size: 19px !important; /* 3px larger than h3 (16px) */
+    font-weight: 700 !important;
+    margin-bottom: 20px !important;
+    margin-top: 0 !important;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px !important;
+}
+
+.daytime-tracker-settings-desc {
+    padding-left: 16px !important;
+}
+
+.daytime-category-setting-item {
+    display: flex !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+}
+.daytime-category-setting-item .setting-item-info {
+    display: none !important;
+}
+.daytime-category-setting-item .setting-item-control {
+    display: flex !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    width: 100% !important;
+    gap: 8px !important;
+}
+.daytime-category-setting-item .setting-item-control button {
+    margin-left: auto !important;
+}

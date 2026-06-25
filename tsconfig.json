@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "inlineSourceMap": true,
+    "inlineSources": true,
+    "module": "ESNext",
+    "target": "ES2022",
+    "moduleResolution": "node",
+    "importHelpers": true,
+    "allowJs": true,
+    "strict": true,
+    "jsx": "react-jsx",
+    "lib": ["DOM", "ES2022"],
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true
+  },
+  "include": ["src/**/*"]
+}

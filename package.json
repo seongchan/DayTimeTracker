@@ -1,0 +1,34 @@
+{
+  "name": "daytime-tracker",
+  "version": "1.0.0",
+  "description": "Obsidian DayTime Tracker plugin using 10-minute grid planner",
+  "main": "main.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production"
+  },
+  "keywords": [
+    "obsidian",
+    "plugin",
+    "timeline",
+    "logger",
+    "time-tracker"
+  ],
+  "author": "Hong SeongChan",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^16.11.6",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.1",
+    "builtin-modules": "^3.3.0",
+    "esbuild": "^0.25.0",
+    "obsidian": "latest",
+    "tslib": "^2.6.2",
+    "typescript": "^5.4.5"
+  }
+}
