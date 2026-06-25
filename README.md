@@ -6,6 +6,7 @@
 <center>
   <img src="DayTimeTracker_sample.png" width="80%">
 </center>
+
 ---
 
 ## 주요 기능
