@@ -1,50 +1,46 @@
-# DayTime Tracker (옵시디언 타임라인 기록 플러그인)
+# DayTime Tracker (Obsidian Timeline Logging Plugin)
 
-하루의 활동을 10분 단위 타임테이블 격자 그리드 형태로 직관적으로 기록하고, 이를 노트에 보관하는 옵시디언 플러그인입니다.
+An Obsidian plugin that lets you intuitively log daily activities in a 10-minute grid timetable and stores them in your note.  
 
-
-<center>
-  <img src="DayTimeTracker_sample.png" width="80%">
-</center>
+![DayTime Tracker](DayTimeTracker_sample.png)
 
 ---
 
-## 주요 기능
+## ✨ Key Features
 
-1. **10분 단위 격자 그리드**: 하루 24시간을 1시간당 6칸(1칸당 10분)의 격자로 정밀하게 보여주며, 마우스 드래그를 통해 간편하게 시간 범위를 선택하여 일과를 기록할 수 있습니다.
-2. **카테고리 기반 그리드 및 시각화**: 각 일과 기록은 지정된 카테고리의 색상 칩으로 타임라인 상에 오버레이되며, 마우스를 올리면 상세 내용과 연계된 할 일이 툴팁으로 표시됩니다.
-3. **접이식 To-Do(오늘 할 일) 리스트 및 타임라인 연동**:
-   - 타임라인 최하단에 접고 펼 수 있는 To-Do 리스트가 탑재되어 있습니다.
-   - 할 일 완료 체크 시: `"이 할 일을 타임라인에 기록할까요?"` 확인 창이 떠서 [확인] 클릭 시 현재 시간대를 기준으로 할 일 텍스트가 자동 완성된 일과 기록 모달이 열립니다.
-   - 할 일 체크 해제 시: 만약 연결된 타임라인 기록이 존재한다면 `"이 할 일과 연결된 타임라인 기록도 함께 삭제할까요?"` 확인 창이 팝업되어 원터치 동기화 삭제를 지원합니다.
-4. **일과 기록 편리한 정렬**: 일과 기록 및 수정 팝업창에서 항목이 `시간 설정 -> 카테고리 칩 선택 -> 내용(상세 메모) -> 연계된 할 일` 순으로 직관적으로 배치되어 빠른 작성이 가능합니다.
-5. **개인화 설정 (Settings)**:
-   - **General (일반 설정)**: 하루 시작/종료 시간 범위 조절, 문서 속성창(Frontmatter Metadata Container) 자동 감추기 토글, 언어 선택(한국어/영어), 배경 테마 모드(기본 테마 / 페이퍼 화이트) 설정을 제공합니다.
-   - **Category Management (카테고리 설정)**: 기본 제공되는 5대 카테고리(Work, Study, Rest, Reading, Exercise)의 이름을 원하는 대로 수정하거나 고유 색상을 지정할 수 있습니다. 추가로 필요한 카테고리는 최대 10개까지 신규 생성할 수 있으며, 커스텀 카테고리는 우측 끝의 `X` 버튼으로 언제든지 쉽게 삭제 가능합니다.
-6. **오늘의 데일리 노트 바로가기/생성**: 오늘 날짜(`YYYY-MM-DD.md`) 노트를 원터치로 조회 및 생성하여 열어주는 기능을 내장하고 있습니다.
-7. **타임라인 PDF 인쇄 및 HTML 내보내기**:
-   - 우측 상단 헤더의 **[PDF 인쇄]** 버튼을 클릭하면 오늘 하루의 타임라인 그리드와 To-Do 리스트가 인쇄 전용 HTML 파일로 내보내집니다.
-   - 내보낸 파일은 시스템 기본 브라우저에서 자동으로 열리며, 한글 폰트 깨짐 현상 없이 깔끔한 PDF로 저장하거나 인쇄할 수 있는 인쇄 전용 버튼을 제공합니다.
+1. **10-Minute Timetable Grid**: Displays 24 hours of the day with 6 cells per hour (10 minutes per cell). You can easily record your activities by dragging and selecting a time range.
+2. **Category-Based Grid & Visualization**: Each activity log is overlayed on the timeline with color chips based on the designated category. Hovering over a log shows a tooltip with details and the linked To-Do item.
+3. **Collapsible To-Do List & Timeline Integration**:
+   - A collapsible To-Do list is situated at the bottom of the timeline view.
+   - When marking a To-Do as complete: A confirmation window asks, `"Would you like to record this To-Do on the timeline?"`. Clicking [Confirm] opens the activity log modal with the To-Do text pre-filled and the time set to the current hour.
+   - When unchecking a To-Do: If a linked timeline log exists, a confirmation window pops up asking, `"Would you like to delete the linked timeline log too?"`, supporting one-touch synchronized deletion.
+4. **Intuitive Form Layout**: The fields in the activity creation and edit modal are arranged cleanly in the order of: `Time settings -> Category chip selection -> Notes (detailed description) -> Linked To-Do`, facilitating quick entries.
+5. **Personalization (Settings)**:
+   - **General**: Configure the start and end hour range for the day, toggle whether to automatically hide the note's properties section (Frontmatter Metadata Container), select the UI language (Korean/English), and choose a background theme mode (Default / Paper White).
+   - **Category Management**: Edit the names and customize the colors of the 5 default categories (Work, Study, Rest, Reading, Exercise). You can also add up to 10 custom categories, and easily delete custom ones by clicking the `X` button.
+6. **Go to / Create Today's Daily Note**: Features a one-touch button to search for or create today's daily note (`YYYY-MM-DD.md`) and open it immediately.
+7. **Print Timeline to PDF & Export HTML**:
+   - Click the **[Print PDF]** button at the top-right header to export today's timeline grid and To-Do list into a print-optimized HTML file.
+   - The exported file opens automatically in your system's default browser, providing a dedicated print button to save it as a clean PDF or print it without font or styling issues.
 
 ---
 
+## 💡 Usage
 
-## 사용 방법
-
-1. **타임라인 창 열기**:
-   옵시디언 리본 메뉴에 새로 생긴 **달력과 시계 모양 아이콘**을 클릭하거나 단축키 `Ctrl + P`를 눌러 `Open DayTime Tracker View`를 실행하면 오른쪽 사이드바에 타임라인 판이 열립니다.
-2. **데일리 노트 열기**:
-   열려있거나 포커싱된 노트가 없을 때는 타임라인 창의 **[오늘의 데일리 노트 만들기]** 버튼을 클릭하여 즉시 오늘 날짜 노트를 만들어 시작할 수 있습니다.
-3. **To-Do 리스트 활용 및 타임라인 상호 작용**:
-   - 하단 "오늘 할 일" 헤더의 화살표 버튼을 클릭해 To-Do 영역을 마음대로 접고 펼 수 있습니다.
-   - 새로운 할 일을 추가하고 완료 시 체크박스를 클릭합니다.
-   - 팝업 대화 상자의 안내에 따라 완료된 할 일을 시간표 상에 바로 매핑하거나, 완료 해제 시 관련된 타임라인 로그를 즉각 동기화하여 삭제할 수 있습니다.
-4. **일과 드래그 기록 및 할 일 가져오기**:
-   - 시간표 위에서 원하는 시간 범위를 드래그 앤 드롭합니다.
-   - "일과 기록" 팝업 모달창이 나타나면, 하단에 노출되는 미완료 To-Do 항목 칩을 클릭해 입력칸을 즉시 자동 완성합니다.
-   - 저장을 완료하면 격자판에 색상 블록이 오버레이되며, 데이터는 노트 Frontmatter에 저장됩니다.
-5. **타임라인 PDF/인쇄 내보내기**:
-   - 타임라인 우측 상단 헤더의 **[PDF 인쇄]** 버튼을 클릭합니다.
-   - 성공 메시지("타임라인 인쇄용 HTML 파일이 생성되었습니다...") 알림과 함께 웹 브라우저에서 인쇄 미리보기 화면이 자동으로 열립니다.
-   - 브라우저 창 상단의 **[PDF로 저장 / 인쇄하기]** 버튼을 클릭하면 브라우저 인쇄 창이 활성화되어, 간편하게 PDF로 변환하거나 종이로 인쇄할 수 있습니다.
+1. **Open the Timeline View**:
+   Click the **calendar-clock icon** in the ribbon menu or search for `Open DayTime Tracker View` in the command palette (`Ctrl + P` or `Cmd + P`) to open the timeline panel in the right sidebar.
+2. **Open Daily Note**:
+   If there is no active note, click the **[Create Today's Daily Note]** in the timeline view to immediately generate and start logging on today's note.
+3. **Use To-Do List & Interactivity**:
+   - Click the arrow button in the "Today's To-Dos" header to collapse or expand the section.
+   - Add new tasks and check the checkbox when they are completed.
+   - Follow the prompts in the confirmation modal to immediately map the completed To-Do to the timetable, or dynamically sync and delete the linked timeline log when unchecking a task.
+4. **Drag to Record & Select To-Do**:
+   - Drag and drop on the timetable to select a time range.
+   - In the activity modal, you can click on any incomplete To-Do chips at the bottom to automatically pre-fill the activity details.
+   - Once saved, a colored block will overlay the grid and the log entry will be saved in the note's Frontmatter.
+5. **Print PDF / Export**:
+   - Click the **[Print PDF]** button at the top-right header of the timeline.
+   - Once exported, a notice will appear and a browser tab will automatically open with a print preview.
+   - Click the **[Save as PDF / Print]** button at the top of the browser page to open the print dialog.
 

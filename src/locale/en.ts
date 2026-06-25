@@ -53,8 +53,8 @@ const en = {
     SETTING_THEME_MODE_NAME: "Background Theme Mode",
     SETTING_THEME_MODE_DESC: "Select the background color theme for the sidebar view.",
     THEME_MODE_DEFAULT: "System Default",
-    THEME_MODE_LIGHT: "Paper White",
-    THEME_MODE_DARK: "Digital Dark",
+    THEME_MODE_LIGHT: "Light",
+    THEME_MODE_DARK: "Dark",
     
     // Custom Categories
     SETTING_CATEGORIES_SECTION: "Category Management",

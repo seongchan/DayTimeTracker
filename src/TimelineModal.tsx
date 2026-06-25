@@ -244,6 +244,7 @@ export class TimelineModal extends Modal {
     private defaultContent: string;
     private language: string;
     private categories: CustomCategory[];
+    private themeMode: string;
     private onSave: (entry: TimelineLogEntry) => void;
     private onDelete?: () => void;
 
@@ -257,6 +258,7 @@ export class TimelineModal extends Modal {
         defaultContent: string,
         language: string,
         categories: CustomCategory[],
+        themeMode: string,
         onSave: (entry: TimelineLogEntry) => void,
         onDelete?: () => void
     ) {
@@ -269,12 +271,16 @@ export class TimelineModal extends Modal {
         this.defaultContent = defaultContent;
         this.language = language;
         this.categories = categories;
+        this.themeMode = themeMode;
         this.onSave = onSave;
         this.onDelete = onDelete;
     }
 
     onOpen() {
         this.containerEl.addClass("timeline-custom-modal-container");
+        // "default"(옵시디언 테마 기본값)는 실제 활성 테마 색상을 알 수 없으므로
+        // 페이퍼 화이트 모양으로 표현한다.
+        this.containerEl.addClass(this.themeMode === "dark" ? "theme-force-dark" : "theme-force-light");
         const { contentEl } = this;
         contentEl.empty();
         

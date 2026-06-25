@@ -285,6 +285,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
                 plugin.app,
                 t("CONFIRM_RECORD_TIMELINE", settings.language),
                 settings.language,
+                settings.themeMode,
                 () => {
                     // On confirm, check To-Do and open TimelineModal
                     void (async () => {
@@ -317,6 +318,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
                             todo.content,
                             settings.language,
                             settings.categories,
+                            settings.themeMode,
                             (newEntry) => {
                                 void handleSave(newEntry);
                             }
@@ -353,6 +355,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
                     plugin.app,
                     t("CONFIRM_DELETE_LINKED_LOG", settings.language),
                     settings.language,
+                    settings.themeMode,
                     () => {
                         // On confirm, uncheck To-Do and delete log block
                         void (async () => {
@@ -454,6 +457,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
             plugin.app,
             message,
             settings.language,
+            settings.themeMode,
             () => {
                 void (async () => {
                     await plugin.app.fileManager.processFrontMatter(activeFile, (fm) => {
@@ -510,6 +514,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
             "",
             settings.language,
             settings.categories,
+            settings.themeMode,
             (newEntry) => { void handleSave(newEntry); }
         );
         modal.open();
@@ -529,6 +534,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
             "",
             settings.language,
             settings.categories,
+            settings.themeMode,
             (updatedEntry) => { void handleSave(updatedEntry, index); },
             () => { void handleDelete(index); }
         );
@@ -1207,30 +1213,34 @@ class ConfirmModal extends Modal {
     private onCancel?: () => void;
     private isConfirmed = false;
     private language: string;
+    private themeMode: string;
 
-    constructor(app: App, message: string, language: string, onConfirm: () => void, onCancel?: () => void) {
+    constructor(app: App, message: string, language: string, themeMode: string, onConfirm: () => void, onCancel?: () => void) {
         super(app);
         this.message = message;
         this.language = language;
+        this.themeMode = themeMode;
         this.onConfirm = onConfirm;
         this.onCancel = onCancel;
     }
 
     onOpen() {
         this.containerEl.addClass("timeline-custom-modal-container");
+        // "default"(옵시디언 테마 기본값)는 실제 활성 테마 색상을 알 수 없으므로
+        // 페이퍼 화이트 모양으로 표현한다.
+        this.containerEl.addClass(this.themeMode === "dark" ? "theme-force-dark" : "theme-force-light");
         const { contentEl } = this;
         contentEl.empty();
-        
+
         this.titleEl.setText(this.language === "ko" ? "알림" : "Notice");
-        
-        const p = contentEl.createEl("p", { 
+
+        const p = contentEl.createEl("p", {
             text: this.message
         });
         p.setCssStyles({
             marginBottom: "20px",
             fontSize: "14px",
-            lineHeight: "1.5",
-            color: "var(--text-normal)"
+            lineHeight: "1.5"
         });
 
         const btnContainer = contentEl.createDiv();

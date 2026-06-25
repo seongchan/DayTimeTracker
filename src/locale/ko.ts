@@ -55,8 +55,8 @@ const ko: typeof en = {
     SETTING_THEME_MODE_NAME: "배경 테마 설정",
     SETTING_THEME_MODE_DESC: "사이드바 화면의 배경색 테마를 선택합니다.",
     THEME_MODE_DEFAULT: "옵시디언 테마 기본값",
-    THEME_MODE_LIGHT: "페이퍼 화이트",
-    THEME_MODE_DARK: "디지털 다크",
+    THEME_MODE_LIGHT: "라이트",
+    THEME_MODE_DARK: "다크",
     
     // Custom Categories
     SETTING_CATEGORIES_SECTION: "카테고리 설정",

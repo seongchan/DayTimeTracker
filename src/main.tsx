@@ -289,15 +289,19 @@ class DayTimeTrackerSettingTab extends PluginSettingTab {
                     });
             });
 
-        // Forced Theme setting tab (excluding Dark Mode)
+        // Forced Theme setting tab
         new Setting(containerEl)
             .setName(t("SETTING_THEME_MODE_NAME", lang))
             .setDesc(t("SETTING_THEME_MODE_DESC", lang))
             .addDropdown((dropdown) => {
+                // "옵시디언 테마 기본값"(default)은 더 이상 옵션으로 노출하지 않는다.
+                // 과거 배포본에서 이 값을 선택해둔 사용자의 설정은 그대로 유지되고,
+                // 드롭다운에는 라이트로 표시되다가 사용자가 직접 바꾸면 그때부터
+                // light/dark 중 하나로 저장된다.
                 dropdown
-                    .addOption("default", t("THEME_MODE_DEFAULT", lang))
                     .addOption("light", t("THEME_MODE_LIGHT", lang))
-                    .setValue(this.plugin.settings.themeMode || "default")
+                    .addOption("dark", t("THEME_MODE_DARK", lang))
+                    .setValue(this.plugin.settings.themeMode === "dark" ? "dark" : "light")
                     .onChange(async (value) => {
                         this.plugin.settings.themeMode = value;
                         await this.plugin.saveSettings();
