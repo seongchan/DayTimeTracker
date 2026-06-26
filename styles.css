@@ -261,277 +261,106 @@ body.daytime-tracker-hide-properties .metadata-container {
     background-color: var(--background-modifier-error-hover);
 }
 
-/* Custom modal layout overrides. Structural rules (sizing/spacing) are
-   shared; colors are split into .theme-force-light / .theme-force-dark
-   variants below so the modal can follow the plugin's Background Theme
-   Mode setting instead of always being white.
-   !important kept throughout this block: themes can ship modal/button/text
-   colors with unpredictable specificity, so plain specificity isn't a
-   reliable way to win here. */
+/* Custom modal layout overrides. These only set structure (sizing/spacing/
+   layout) and lean on Obsidian's own CSS variables for every color, so the
+   popup always matches whatever theme the user currently has active —
+   there is nothing here that competes with theme CSS, so no !important or
+   specificity tricks are needed. */
 .timeline-custom-modal-container {
-    background-color: rgba(0, 0, 0, 0.45) !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+    background-color: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .timeline-custom-modal-container .modal {
-    border-radius: 12px !important;
-    max-width: 400px !important;
-    width: 90% !important;
-    padding: 24px !important;
-    box-sizing: border-box !important;
-}
-
-.timeline-custom-modal-container.theme-force-light .modal {
-    background-color: #ffffff !important;
-    color: #111111 !important;
-    border: 1px solid rgba(0, 0, 0, 0.08) !important;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
-}
-
-.timeline-custom-modal-container.theme-force-dark .modal {
-    background-color: #1a1a1a !important;
-    color: #e0e0e0 !important;
-    border: 1px solid #333333 !important;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.3) !important;
+    border-radius: 12px;
+    max-width: 400px;
+    width: 90%;
+    padding: 24px;
+    box-sizing: border-box;
 }
 
 .timeline-custom-modal-container .modal-title {
-    font-size: 18px !important;
-    font-weight: 700 !important;
-    margin-top: 0 !important;
-    margin-bottom: 16px !important;
-    padding-bottom: 12px !important;
-    text-align: left !important;
+    font-size: 18px;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-color);
+    text-align: left;
 }
 
-.timeline-custom-modal-container.theme-force-light .modal-title {
-    color: #000000 !important;
-    border-bottom: 1px solid #f1f5f9 !important;
-}
-
-.timeline-custom-modal-container.theme-force-dark .modal-title {
-    color: #f1f5f9 !important;
-    border-bottom: 1px solid #333333 !important;
-}
-
-/* Modals content/forms inside the modal */
-.timeline-custom-modal-container .timeline-modal-container input[type="text"],
-.timeline-custom-modal-container .timeline-modal-container textarea {
-    border-radius: 6px !important;
-}
-
-.timeline-custom-modal-container.theme-force-light .timeline-modal-container input[type="text"],
-.timeline-custom-modal-container.theme-force-light .timeline-modal-container textarea {
-    background-color: #ffffff !important;
-    border: 1px solid #cbd5e1 !important;
-    color: #333333 !important;
-}
-
-.timeline-custom-modal-container.theme-force-dark .timeline-modal-container input[type="text"],
-.timeline-custom-modal-container.theme-force-dark .timeline-modal-container textarea {
-    background-color: #242424 !important;
-    border: 1px solid #444444 !important;
-    color: #e0e0e0 !important;
-}
-
-.timeline-custom-modal-container.theme-force-light .timeline-modal-container input[type="text"]::placeholder,
-.timeline-custom-modal-container.theme-force-light .timeline-modal-container textarea::placeholder {
-    color: #94a3b8 !important;
-}
-
-.timeline-custom-modal-container.theme-force-dark .timeline-modal-container input[type="text"]::placeholder,
-.timeline-custom-modal-container.theme-force-dark .timeline-modal-container textarea::placeholder {
-    color: #777777 !important;
-}
-
-.timeline-custom-modal-container.theme-force-light .timeline-modal-container input[type="text"]:focus,
-.timeline-custom-modal-container.theme-force-light .timeline-modal-container textarea:focus {
-    border-color: #94a3b8 !important;
-    box-shadow: 0 0 0 2px rgba(148, 163, 184, 0.15) !important;
-}
-
-.timeline-custom-modal-container.theme-force-dark .timeline-modal-container input[type="text"]:focus,
-.timeline-custom-modal-container.theme-force-dark .timeline-modal-container textarea:focus {
-    border-color: #6b7280 !important;
-    box-shadow: 0 0 0 2px rgba(107, 114, 128, 0.25) !important;
-}
-
-/* Modal category chip overrides */
-.timeline-custom-modal-container .timeline-modal-color-chip {
-    border: 2px solid transparent !important;
-}
-
-.timeline-custom-modal-container.theme-force-light .timeline-modal-color-chip {
-    background-color: #f1f5f9 !important;
-    color: #334155 !important;
-}
-
-.timeline-custom-modal-container.theme-force-light .timeline-modal-color-chip.is-selected {
-    border-color: #64748b !important;
-    background-color: #e2e8f0 !important;
-}
-
-.timeline-custom-modal-container.theme-force-dark .timeline-modal-color-chip {
-    background-color: #2d2d2d !important;
-    color: #cbd5e1 !important;
-}
-
-.timeline-custom-modal-container.theme-force-dark .timeline-modal-color-chip.is-selected {
-    border-color: #6b7280 !important;
-    background-color: #3a3a3a !important;
-}
-
-/* Modal linked to-do block background */
-.timeline-custom-modal-container.theme-force-light .timeline-modal-linked-todo-text {
-    background-color: #f8fafc !important;
-    border-color: #e2e8f0 !important;
-    color: #334155 !important;
-}
-
-.timeline-custom-modal-container.theme-force-dark .timeline-modal-linked-todo-text {
-    background-color: #242424 !important;
-    border-color: #3a3a3a !important;
-    color: #cbd5e1 !important;
-}
-
-/* Modal text paragraph style in ConfirmModal */
-.timeline-custom-modal-container.theme-force-light p {
-    color: #334155 !important;
-}
-
-.timeline-custom-modal-container.theme-force-dark p {
-    color: #cbd5e1 !important;
-}
-
-/* Modal field labels (시간 설정, 카테고리, 내용) - force identical color per theme */
-.timeline-custom-modal-container label {
-    font-weight: 600 !important;
-}
-
-.timeline-custom-modal-container.theme-force-light label {
-    color: #111111 !important;
-}
-
-.timeline-custom-modal-container.theme-force-dark label {
-    color: #e0e0e0 !important;
-}
-
-/* Modal buttons styling (flat transparent with borders) */
+/* Modal buttons (flat, outlined "Cancel"-style by default; .mod-cta and
+   .is-delete keep Obsidian's own accent/error button styling untouched) */
 .timeline-custom-modal-container button {
-    font-size: 13px !important;
-    padding: 6px 12px !important;
-    border-radius: 6px !important;
-    font-weight: 500 !important;
-    cursor: pointer !important;
-    transition: background-color 0.15s ease, border-color 0.15s ease !important;
-    outline: none !important;
-    background-color: transparent !important;
-    box-shadow: none !important; /* Remove native shadow effects */
+    font-size: 13px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
-.timeline-custom-modal-container.theme-force-light button {
-    border: 1px solid #cbd5e1 !important;
-    color: #475569 !important;
+.timeline-custom-modal-container button:not(.mod-cta):not(.is-delete) {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-normal);
 }
 
-.timeline-custom-modal-container.theme-force-dark button {
-    border: 1px solid #4a5568 !important;
-    color: #cbd5e1 !important;
+.timeline-custom-modal-container button:not(.mod-cta):not(.is-delete):hover {
+    background-color: var(--background-modifier-hover);
 }
 
-/* Primary/Confirm button (e.g. Save, Confirm) */
-.timeline-custom-modal-container.theme-force-light button.mod-cta {
-    border: 1px solid #64748b !important;
-    color: #1e293b !important;
-    box-shadow: none !important;
-}
-
-.timeline-custom-modal-container.theme-force-light button.mod-cta:hover {
-    background-color: #cbd5e1 !important;
-}
-
-.timeline-custom-modal-container.theme-force-dark button.mod-cta {
-    border: 1px solid #94a3b8 !important;
-    color: #f1f5f9 !important;
-    box-shadow: none !important;
-}
-
-.timeline-custom-modal-container.theme-force-dark button.mod-cta:hover {
-    background-color: #374151 !important;
-}
-
-/* Secondary/Cancel button */
-.timeline-custom-modal-container.theme-force-light button:not(.mod-cta):not(.is-delete):hover {
-    background-color: #f1f5f9 !important;
-}
-
-.timeline-custom-modal-container.theme-force-dark button:not(.mod-cta):not(.is-delete):hover {
-    background-color: #2d2d2d !important;
-}
-
-/* Delete button */
 .timeline-custom-modal-container button.is-delete {
-    margin-right: auto !important;
+    margin-right: auto;
+    background-color: var(--background-modifier-error);
+    color: var(--text-on-accent);
 }
 
-.timeline-custom-modal-container.theme-force-light button.is-delete {
-    border: 1px solid #fca5a5 !important;
-    color: #991b1b !important;
-}
-
-.timeline-custom-modal-container.theme-force-light button.is-delete:hover {
-    background-color: #fee2e2 !important;
-}
-
-.timeline-custom-modal-container.theme-force-dark button.is-delete {
-    border: 1px solid #7f1d1d !important;
-    color: #fca5a5 !important;
-}
-
-.timeline-custom-modal-container.theme-force-dark button.is-delete:hover {
-    background-color: #450a0a !important;
+.timeline-custom-modal-container button.is-delete:hover {
+    background-color: var(--background-modifier-error-hover);
 }
 
 /* Header and empty state button styling (Light Theme default matching mockup).
-   !important kept: this forces a fixed button look across both Obsidian
-   light/dark core themes and our own force-light/force-dark modes, which
-   would otherwise be overridden by theme-supplied button colors. */
-.theme-light .daytime-tracker-header button,
-.daytime-tracker-view-root.theme-force-light .daytime-tracker-header button,
-.daytime-tracker-header button {
-    background-color: #ffffff !important;
-    color: #475569 !important;
-    border: 1px solid #e2e8f0 !important;
-    border-radius: 4px !important;
-    padding: 6px 10px !important;
-    font-size: 11px !important;
-    font-weight: 500 !important;
-    cursor: pointer !important;
-    transition: all 0.1s ease !important;
-    box-shadow: none !important;
+   `.daytime-tracker-header` is repeated to raise specificity above typical
+   theme `button` rules without using !important; this still loses to a
+   theme rule that itself uses !important, but that's an acceptable edge
+   case for a non-critical button look (unlike the modal text contrast
+   issue this plugin hit before). */
+.theme-light .daytime-tracker-header.daytime-tracker-header button,
+.daytime-tracker-view-root.theme-force-light .daytime-tracker-header.daytime-tracker-header button,
+.daytime-tracker-header.daytime-tracker-header button {
+    background-color: #ffffff;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    padding: 6px 10px;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    box-shadow: none;
 }
 
-.theme-light .daytime-tracker-header button:hover,
-.daytime-tracker-view-root.theme-force-light .daytime-tracker-header button:hover,
-.daytime-tracker-header button:hover {
-    background-color: #f1f5f9 !important;
-    color: #1e293b !important;
+.theme-light .daytime-tracker-header.daytime-tracker-header button:hover,
+.daytime-tracker-view-root.theme-force-light .daytime-tracker-header.daytime-tracker-header button:hover,
+.daytime-tracker-header.daytime-tracker-header button:hover {
+    background-color: #f1f5f9;
+    color: #1e293b;
 }
 
 /* Ensure buttons are styled correctly in dark mode */
-.theme-dark .daytime-tracker-view-root:not(.theme-force-light) .daytime-tracker-header button,
-.theme-force-dark .daytime-tracker-header button {
-    background-color: #2d3748 !important;
-    color: #cbd5e1 !important;
-    border: 1px solid #4a5568 !important;
+.theme-dark .daytime-tracker-view-root:not(.theme-force-light) .daytime-tracker-header.daytime-tracker-header button,
+.theme-force-dark .daytime-tracker-header.daytime-tracker-header button {
+    background-color: #2d3748;
+    color: #cbd5e1;
+    border: 1px solid #4a5568;
 }
 
-.theme-dark .daytime-tracker-view-root:not(.theme-force-light) .daytime-tracker-header button:hover,
-.theme-force-dark .daytime-tracker-header button:hover {
-    background-color: #4a5568 !important;
-    color: #ffffff !important;
+.theme-dark .daytime-tracker-view-root:not(.theme-force-light) .daytime-tracker-header.daytime-tracker-header button:hover,
+.theme-force-dark .daytime-tracker-header.daytime-tracker-header button:hover {
+    background-color: #4a5568;
+    color: #ffffff;
 }
 
 .daytime-tracker-empty button {
@@ -656,14 +485,14 @@ body.daytime-tracker-hide-properties .metadata-container {
     white-space: nowrap;
 }
 
-/* !important kept on border/background/box-shadow below: these strip
-   Obsidian's default native button chrome, which themes commonly restyle
-   with their own background/border/shadow rules. */
+/* This is a single-class selector on the button's own element (not a
+   descendant rule), so it already outranks a generic `button` theme rule
+   on specificity alone — no !important needed. */
 .timeline-todo-delete-btn {
-    border: none !important;
-    background: transparent !important;
-    background-color: transparent !important;
-    box-shadow: none !important;
+    border: none;
+    background: transparent;
+    background-color: transparent;
+    box-shadow: none;
     color: var(--text-muted);
     font-size: 12px;
     padding: 2px 6px;
@@ -680,12 +509,12 @@ body.daytime-tracker-hide-properties .metadata-container {
 .timeline-todo-delete-btn:hover,
 .timeline-todo-delete-btn:focus,
 .timeline-todo-delete-btn:active {
-    color: #ef4444 !important;
-    background: transparent !important;
-    background-color: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    outline: none !important;
+    color: #ef4444;
+    background: transparent;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    outline: none;
 }
 
 /* Modal Todo Suggestions */
@@ -724,207 +553,207 @@ body.daytime-tracker-hide-properties .metadata-container {
     border-color: var(--text-accent);
 }
 
-/* Print CSS.
-   !important kept: forces black-on-white print output regardless of the
-   active Obsidian theme's (often dark) on-screen colors. */
+/* Print CSS. These only compete with this same file's own earlier rules
+   on these custom classes (no third-party theme styles this plugin's own
+   class names), so normal cascade order is enough without !important. */
 @media print {
     .daytime-tracker-header {
-        background-color: transparent !important;
-        border-bottom: 2px solid #000000 !important;
+        background-color: transparent;
+        border-bottom: 2px solid #000000;
     }
 
     .daytime-tracker-body {
-        overflow: visible !important;
-        padding: 0 !important;
+        overflow: visible;
+        padding: 0;
     }
 
     .timeline-grid {
-        border-top: 2px solid #000000 !important;
-        border-left: 2px solid #000000 !important;
+        border-top: 2px solid #000000;
+        border-left: 2px solid #000000;
     }
 
     .timeline-hour-label {
-        background-color: transparent !important;
-        border-bottom: 1px solid #000000 !important;
-        color: #000000 !important;
+        background-color: transparent;
+        border-bottom: 1px solid #000000;
+        color: #000000;
     }
 
     .timeline-cell {
-        border-right: 1px solid #000000 !important;
-        border-bottom: 1px solid #000000 !important;
+        border-right: 1px solid #000000;
+        border-bottom: 1px solid #000000;
     }
 
     .timeline-log-block {
-        box-shadow: none !important;
-        border: 1px solid rgba(0,0,0,0.2) !important;
+        box-shadow: none;
+        border: 1px solid rgba(0,0,0,0.2);
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
 }
 
-/* Force Light / Paper White Theme overrides.
-   !important kept throughout: the whole point of theme-force-light/dark is
-   to look identical no matter which Obsidian theme is active, so these
-   must win over whatever colors the active theme defines. */
+/* Force Light / Paper White Theme overrides. These target this plugin's
+   own unique class names exclusively (no community theme styles
+   `.daytime-tracker-*` / `.timeline-*`), so there is no real selector to
+   compete with — normal specificity is enough, no !important needed. */
 .daytime-tracker-view-root.theme-force-light {
-    background-color: #ffffff !important;
-    color: #111111 !important;
+    background-color: #ffffff;
+    color: #111111;
 }
 .daytime-tracker-view-root.theme-force-light .daytime-tracker-header,
 .daytime-tracker-view-root.theme-force-light .timeline-todos-header {
-    background-color: #f7f7f7 !important;
-    border-color: #e5e5e5 !important;
+    background-color: #f7f7f7;
+    border-color: #e5e5e5;
 }
 .daytime-tracker-view-root.theme-force-light .daytime-tracker-title,
 .daytime-tracker-view-root.theme-force-light .timeline-todos-title,
 .daytime-tracker-view-root.theme-force-light .timeline-todo-text {
-    color: #111111 !important;
+    color: #111111;
 }
 .daytime-tracker-view-root.theme-force-light .timeline-grid,
 .daytime-tracker-view-root.theme-force-light .timeline-row,
 .daytime-tracker-view-root.theme-force-light .timeline-cell,
 .daytime-tracker-view-root.theme-force-light .timeline-hour-label {
-    border-color: rgba(0, 0, 0, 0.06) !important;
+    border-color: rgba(0, 0, 0, 0.06);
 }
 .daytime-tracker-view-root.theme-force-light .timeline-hour-label {
-    background-color: #fafafa !important;
-    color: #666666 !important;
+    background-color: #fafafa;
+    color: #666666;
 }
 .daytime-tracker-view-root.theme-force-light .timeline-cell:hover {
-    background-color: #f0f0f0 !important;
+    background-color: #f0f0f0;
 }
 .daytime-tracker-view-root.theme-force-light .timeline-todos-container {
-    background-color: #ffffff !important;
-    border-color: #e5e5e5 !important;
+    background-color: #ffffff;
+    border-color: #e5e5e5;
 }
 .daytime-tracker-view-root.theme-force-light .timeline-todos-input-wrapper input {
-    background-color: #ffffff !important;
-    border-color: #cccccc !important;
-    color: #111111 !important;
+    background-color: #ffffff;
+    border-color: #cccccc;
+    color: #111111;
 }
 .daytime-tracker-view-root.theme-force-light .timeline-todos-input-wrapper input::placeholder {
-    color: #999999 !important;
+    color: #999999;
 }
 .daytime-tracker-view-root.theme-force-light .timeline-todo-item:hover {
-    background-color: #f5f5f5 !important;
+    background-color: #f5f5f5;
 }
 .daytime-tracker-view-root.theme-force-light .daytime-tracker-empty {
-    background-color: #ffffff !important;
-    color: #666666 !important;
+    background-color: #ffffff;
+    color: #666666;
 }
 
 /* Force Dark / Digital Dark Theme overrides */
 .daytime-tracker-view-root.theme-force-dark {
-    background-color: #1a1a1a !important;
-    color: #e0e0e0 !important;
+    background-color: #1a1a1a;
+    color: #e0e0e0;
 }
 .daytime-tracker-view-root.theme-force-dark .daytime-tracker-header,
 .daytime-tracker-view-root.theme-force-dark .timeline-todos-header {
-    background-color: #242424 !important;
-    border-color: #333333 !important;
+    background-color: #242424;
+    border-color: #333333;
 }
 .daytime-tracker-view-root.theme-force-dark .daytime-tracker-title,
 .daytime-tracker-view-root.theme-force-dark .timeline-todos-title,
 .daytime-tracker-view-root.theme-force-dark .timeline-todo-text {
-    color: #e0e0e0 !important;
+    color: #e0e0e0;
 }
 .daytime-tracker-view-root.theme-force-dark .timeline-grid,
 .daytime-tracker-view-root.theme-force-dark .timeline-row,
 .daytime-tracker-view-root.theme-force-dark .timeline-cell,
 .daytime-tracker-view-root.theme-force-dark .timeline-hour-label {
-    border-color: #333333 !important;
+    border-color: #333333;
 }
 .daytime-tracker-view-root.theme-force-dark .timeline-hour-label {
-    background-color: #202020 !important;
-    color: #aaaaaa !important;
+    background-color: #202020;
+    color: #aaaaaa;
 }
 .daytime-tracker-view-root.theme-force-dark .timeline-cell:hover {
-    background-color: #2a2a2a !important;
+    background-color: #2a2a2a;
 }
 .daytime-tracker-view-root.theme-force-dark .timeline-todos-container {
-    background-color: #1a1a1a !important;
-    border-color: #333333 !important;
+    background-color: #1a1a1a;
+    border-color: #333333;
 }
 .daytime-tracker-view-root.theme-force-dark .timeline-todos-input-wrapper input {
-    background-color: #242424 !important;
-    border-color: #444444 !important;
-    color: #e0e0e0 !important;
+    background-color: #242424;
+    border-color: #444444;
+    color: #e0e0e0;
 }
 .daytime-tracker-view-root.theme-force-dark .timeline-todos-input-wrapper input::placeholder {
-    color: #777777 !important;
+    color: #777777;
 }
 .daytime-tracker-view-root.theme-force-dark .timeline-todo-item:hover {
-    background-color: #2d2d2d !important;
+    background-color: #2d2d2d;
 }
 .daytime-tracker-view-root.theme-force-dark .daytime-tracker-empty {
-    background-color: #1a1a1a !important;
-    color: #aaaaaa !important;
+    background-color: #1a1a1a;
+    color: #aaaaaa;
 }
 
-/* DayTime Tracker Settings compact styling.
-   !important kept: these override Obsidian's own core `.setting-item*`
-   classes, which already carry their own specific built-in rules, so a
-   plain single-class override can lose depending on core CSS load order. */
-.daytime-tracker-settings .setting-item {
-    padding: 6px 16px 6px 16px !important;
-    border-bottom: 1px dashed rgba(128, 128, 128, 0.15) !important;
+/* DayTime Tracker Settings compact styling. The scoping class is repeated
+   (`.daytime-tracker-settings.daytime-tracker-settings`) to raise
+   specificity above Obsidian's own core `.setting-item*` rules without
+   using !important. */
+.daytime-tracker-settings.daytime-tracker-settings .setting-item {
+    padding: 6px 16px 6px 16px;
+    border-bottom: 1px dashed rgba(128, 128, 128, 0.15);
 }
-.daytime-tracker-settings .setting-item-name {
-    font-size: 13px !important;
-    font-weight: 500 !important;
+.daytime-tracker-settings.daytime-tracker-settings .setting-item-name {
+    font-size: 13px;
+    font-weight: 500;
 }
-.daytime-tracker-settings .setting-item-description {
-    font-size: 11px !important;
-    color: var(--text-muted) !important;
+.daytime-tracker-settings.daytime-tracker-settings .setting-item-description {
+    font-size: 11px;
+    color: var(--text-muted);
 }
-.daytime-tracker-settings input[type="text"] {
-    font-size: 11px !important;
-    padding: 4px 6px !important;
-    height: 26px !important;
+.daytime-tracker-settings.daytime-tracker-settings input[type="text"] {
+    font-size: 11px;
+    padding: 4px 6px;
+    height: 26px;
 }
-.daytime-tracker-settings .setting-item-control {
-    gap: 4px !important;
+.daytime-tracker-settings.daytime-tracker-settings .setting-item-control {
+    gap: 4px;
 }
-.daytime-tracker-settings h2,
-.daytime-tracker-settings h3 {
-    margin-top: 14px !important;
-    margin-bottom: 6px !important;
-    margin-left: 0 !important;
-    padding-left: 0 !important;
-}
-
-.daytime-tracker-settings h3 {
-    font-size: 16px !important;
+.daytime-tracker-settings.daytime-tracker-settings h2,
+.daytime-tracker-settings.daytime-tracker-settings h3 {
+    margin-top: 14px;
+    margin-bottom: 6px;
+    margin-left: 0;
+    padding-left: 0;
 }
 
-.daytime-settings-main-title {
-    font-size: 19px !important; /* 3px larger than h3 (16px) */
-    font-weight: 700 !important;
-    margin-bottom: 20px !important;
-    margin-top: 0 !important;
+.daytime-tracker-settings.daytime-tracker-settings h3 {
+    font-size: 16px;
+}
+
+.daytime-settings-main-title.daytime-settings-main-title {
+    font-size: 19px; /* 3px larger than h3 (16px) */
+    font-weight: 700;
+    margin-bottom: 20px;
+    margin-top: 0;
     border-bottom: 1px solid var(--border-color);
-    padding-bottom: 10px !important;
+    padding-bottom: 10px;
 }
 
-.daytime-tracker-settings-desc {
-    padding-left: 16px !important;
+.daytime-tracker-settings-desc.daytime-tracker-settings-desc {
+    padding-left: 16px;
 }
 
-.daytime-category-setting-item {
-    display: flex !important;
-    justify-content: flex-start !important;
-    align-items: center !important;
+.daytime-category-setting-item.daytime-category-setting-item {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
 }
-.daytime-category-setting-item .setting-item-info {
-    display: none !important;
+.daytime-category-setting-item.daytime-category-setting-item .setting-item-info {
+    display: none;
 }
-.daytime-category-setting-item .setting-item-control {
-    display: flex !important;
-    justify-content: flex-start !important;
-    align-items: center !important;
-    width: 100% !important;
-    gap: 8px !important;
+.daytime-category-setting-item.daytime-category-setting-item .setting-item-control {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    gap: 8px;
 }
-.daytime-category-setting-item .setting-item-control button {
-    margin-left: auto !important;
+.daytime-category-setting-item.daytime-category-setting-item .setting-item-control button {
+    margin-left: auto;
 }
