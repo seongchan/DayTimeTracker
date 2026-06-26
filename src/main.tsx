@@ -312,8 +312,8 @@ class DayTimeTrackerSettingTab extends PluginSettingTab {
         new Setting(containerEl)
             .setName(t("SETTING_CATEGORIES_SECTION", lang))
             .setHeading();
-        
-        const categoriesDesc = containerEl.createEl("p", { 
+
+        const categoriesDesc = containerEl.createEl("p", {
             text: t("SETTING_CATEGORIES_DESC", lang),
             cls: "daytime-tracker-settings-desc"
         });
@@ -329,7 +329,7 @@ class DayTimeTrackerSettingTab extends PluginSettingTab {
             .setDesc(lang === "ko" ? "카테고리와 색상을 원래의 파스텔톤 기본값으로 재설정합니다." : "Reset all categories and colors to the default pastel values.")
             .addButton((btn) => {
                 btn.setButtonText(lang === "ko" ? "재설정" : "Reset")
-                    .setDestructive()
+                    .setWarning()
                     .onClick(async () => {
                         this.plugin.settings.categories = [...DEFAULT_CATEGORIES];
                         await this.plugin.saveSettings();
@@ -341,7 +341,7 @@ class DayTimeTrackerSettingTab extends PluginSettingTab {
         const categories = this.plugin.settings.categories || [];
         categories.forEach((cat, idx) => {
             const isDefaultCat = cat.isDefault || cat.name === "Work" || cat.name === "Study" || cat.name === "Rest" || cat.name === "Reading" || cat.name === "Exercise";
-            
+
             const settingRow = new Setting(containerEl)
                 .setName("");
             settingRow.settingEl.addClass("daytime-category-setting-item");
@@ -374,7 +374,7 @@ class DayTimeTrackerSettingTab extends PluginSettingTab {
             if (!isDefaultCat) {
                 settingRow.addButton((btn) => {
                     btn.setButtonText("X")
-                        .setDestructive()
+                        .setWarning()
                         .onClick(async () => {
                             this.plugin.settings.categories.splice(idx, 1);
                             await this.plugin.saveSettings();
