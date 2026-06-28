@@ -33,6 +33,25 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
         return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
     }
 
+    function escapeHtml(value: unknown): string {
+        return String(value ?? "").replace(/[&<>"']/g, (char) => {
+            switch (char) {
+                case "&":
+                    return "&amp;";
+                case "<":
+                    return "&lt;";
+                case ">":
+                    return "&gt;";
+                case "\"":
+                    return "&quot;";
+                case "'":
+                    return "&#39;";
+                default:
+                    return char;
+            }
+        });
+    }
+
     // Array.isArray narrows `unknown` to `any[]` in TypeScript, so this wraps
     // it back into `unknown[]` to keep downstream spreads/filters type-safe.
     function toUnknownArray(value: unknown): unknown[] {
@@ -466,6 +485,19 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
                             }
                             return true;
                         });
+
+                        const rawLogs = frontmatter["timeline-logs"];
+                        frontmatter["timeline-logs"] = toUnknownArray(rawLogs).map((log) => {
+                            if (log && typeof log === "object") {
+                                const logItem = log as Record<string, unknown>;
+                                if (logItem.type === "daytime-tracker" && logItem.todoId === todoId) {
+                                    const updatedLog = { ...logItem };
+                                    delete updatedLog.todoId;
+                                    return updatedLog;
+                                }
+                            }
+                            return log;
+                        });
                     });
                     loadLogs(activeFile);
                 })();
@@ -634,11 +666,12 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
                 const linkedTodo = log.todoId ? todos.find(t => t.id === log.todoId) : null;
 
                 const tooltipText = `${log.start} ~ ${log.end} | ${displayTitle}${log.notes ? `\n${settings.language === "ko" ? "내용" : "Content"}: ${log.notes}` : ""}${linkedTodo ? `\n${settings.language === "ko" ? "연계된 할 일" : "Linked To-Do"}: ${linkedTodo.content}` : ""}`;
+                const escapedDisplayTitle = escapeHtml(displayTitle);
 
                 const isShortBlock = (overlapEnd - overlapStart) <= 10;
                 logBlocksHtml += `
-                    <div class="timeline-log-block" style="left: ${leftPercent}%; width: ${widthPercent}%; background-color: ${log.color}; color: ${getTextColorForBackground(log.color)};" title="${tooltipText.replace(/"/g, '&quot;')}">
-                        <strong>${displayTitle}</strong>${isShortBlock ? " (..)" : ` (${log.start}-${log.end})`}
+                    <div class="timeline-log-block" style="left: ${leftPercent}%; width: ${widthPercent}%; background-color: ${log.color}; color: ${getTextColorForBackground(log.color)};" title="${escapeHtml(tooltipText)}">
+                        <strong>${escapedDisplayTitle}</strong>${isShortBlock ? " (..)" : ` (${escapeHtml(log.start)}-${escapeHtml(log.end)})`}
                     </div>
                 `;
             }
@@ -679,7 +712,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
                         ${todos.map(todo => `
                             <li class="timeline-todo-item ${todo.checked ? "is-checked" : ""}">
                                 <input type="checkbox" class="timeline-todo-checkbox" ${todo.checked ? "checked" : ""} disabled />
-                                <span class="timeline-todo-text">${todo.content}</span>
+                                <span class="timeline-todo-text">${escapeHtml(todo.content)}</span>
                             </li>
                         `).join("")}
                     </ul>
@@ -692,7 +725,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
 <html>
 <head>
     <meta charset="utf-8">
-    <title>DayTime Tracker - ${activeFile.basename}</title>
+    <title>DayTime Tracker - ${escapeHtml(activeFile.basename)}</title>
     <style>
         :root {
             --background-primary: ${colors.backgroundPrimary};
@@ -962,7 +995,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ plugin }) => {
 <body>
     <div class="export-page-wrapper">
         <div class="daytime-tracker-header">
-            <h2 class="daytime-tracker-title">DayTime Tracker Timeline - ${dateHeader}</h2>
+            <h2 class="daytime-tracker-title">DayTime Tracker Timeline - ${escapeHtml(dateHeader)}</h2>
             <button class="print-action-btn" onclick="window.print()">${settings.language === "ko" ? "PDF로 저장 / 인쇄하기" : "Save as PDF / Print"}</button>
         </div>
         
