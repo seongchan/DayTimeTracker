@@ -2,6 +2,8 @@ const en = {
     // Sidebar View
     NO_NOTE_OPEN: "No note open",
     NO_NOTE_OPEN_DESC: "Please select an active note to view or edit logs.",
+    NOT_DAILY_NOTE: "Not a daily note",
+    NOT_DAILY_NOTE_DESC: "The current note isn't a daily note (YYYY-MM-DD). Create or open today's daily note to view or edit logs.",
     CREATE_TODAYS_NOTE: "Create today's daily note",
     TODAYS_NOTE: "Today",
     EXPORT_PDF: "Print",
@@ -44,6 +46,9 @@ const en = {
     SETTING_START_HOUR_DESC: "Set the start hour to display on the timeline.",
     SETTING_END_HOUR_NAME: "Day End Hour",
     SETTING_END_HOUR_DESC: "Set the end hour to display on the timeline. (Supports up to midnight 24:00)",
+    SETTING_DAILY_NOTE_FOLDER_NAME: "Daily Note Folder",
+    SETTING_DAILY_NOTE_FOLDER_DESC: "Folder where today's daily note will be created. Leave empty to use the vault root.",
+    SETTING_DAILY_NOTE_FOLDER_PLACEHOLDER: "Vault root",
     SETTING_HIDE_PROPERTIES_NAME: "Hide Document Properties Block",
     SETTING_HIDE_PROPERTIES_DESC: "Completely hide the properties editor (metadata container) at the top of the editor and reading views.",
     ALERT_START_BEFORE_END: "Start hour must be earlier than end hour.",

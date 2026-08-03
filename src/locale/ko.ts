@@ -4,6 +4,8 @@ const ko: typeof en = {
     // Sidebar View
     NO_NOTE_OPEN: "선택된 노트가 없습니다",
     NO_NOTE_OPEN_DESC: "일과를 기록하고 조회하려면 활성화된 노트를 선택해 주세요.",
+    NOT_DAILY_NOTE: "날짜 노트가 아닙니다",
+    NOT_DAILY_NOTE_DESC: "현재 열려 있는 노트는 날짜 형식(YYYY-MM-DD)의 노트가 아닙니다. 오늘의 노트를 생성하거나 열어서 일과를 기록해 주세요.",
     CREATE_TODAYS_NOTE: "오늘의 데일리 노트 생성",
     TODAYS_NOTE: "오늘",
     EXPORT_PDF: "인쇄",
@@ -46,6 +48,9 @@ const ko: typeof en = {
     SETTING_START_HOUR_DESC: "타임라인에 표시할 시작 시간(시)을 설정합니다.",
     SETTING_END_HOUR_NAME: "하루 종료 시간",
     SETTING_END_HOUR_DESC: "타임라인에 표시할 종료 시간(시)을 설정합니다. (자정 24:00까지 지원)",
+    SETTING_DAILY_NOTE_FOLDER_NAME: "날짜 노트 생성 폴더",
+    SETTING_DAILY_NOTE_FOLDER_DESC: "'오늘' 버튼으로 노트를 생성할 때 사용할 폴더를 지정합니다. 비워두면 볼트 최상위 폴더에 생성됩니다.",
+    SETTING_DAILY_NOTE_FOLDER_PLACEHOLDER: "볼트 최상위 폴더",
     SETTING_HIDE_PROPERTIES_NAME: "문서 속성 영역(Properties) 숨기기",
     SETTING_HIDE_PROPERTIES_DESC: "노트 편집기 및 읽기 모드 상단에 표시되는 속성창(속성 제목 및 '+ 속성 추가' 버튼)을 완전히 감춥니다.",
     ALERT_START_BEFORE_END: "시작 시간은 종료 시간보다 빨라야 합니다.",
