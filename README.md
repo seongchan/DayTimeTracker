@@ -44,3 +44,14 @@ An Obsidian plugin that lets you intuitively log daily activities in a 10-minute
    - Once exported, a notice will appear and a browser tab will automatically open with a print preview.
    - Click the **[Save as PDF / Print]** button at the top of the browser page to open the print dialog.
 
+---
+
+## 📝 Update History
+
+For the full release history, see [GitHub Releases](https://github.com/seongchan/DayTimeTracker/releases).
+
+### 1.0.7 (2026-08-03)
+- Added a setting to choose the folder where today's daily note is created via the **[Today]** button.
+- The sidebar view now shows **"Create today's daily note"** instead of the timeline grid when the active note isn't a daily note (not named `YYYY-MM-DD`), preventing logs from being written to an unrelated note.
+- Fixed an issue where the "Hide Document Properties Block" setting could fail to apply right after load; it now re-applies once the workspace finishes loading and whenever you switch notes.
+

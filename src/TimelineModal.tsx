@@ -102,8 +102,8 @@ export const TimelineModalComponent: React.FC<TimelineModalComponentProps> = ({
     }, []);
 
     const handleSave = () => {
-        // Validate time format (HH:mm)
-        const timeRegex = /^([01]\d|2[0-3]):[0-5]\d$/;
+        // Validate time format (HH:mm), allowing 24:00 as the day boundary.
+        const timeRegex = /^(([01]\d|2[0-3]):[0-5]\d|24:00)$/;
         if (!timeRegex.test(start) || !timeRegex.test(end)) {
             new Notice(t("INVALID_TIME_FORMAT", language));
             return;

@@ -1,4 +1,4 @@
-import { App, Plugin, PluginSettingTab, Setting, WorkspaceLeaf, ItemView, Notice, getLanguage } from "obsidian";
+import { App, Plugin, PluginSettingTab, Setting, WorkspaceLeaf, ItemView, Notice, getLanguage, AbstractInputSuggest, TFolder } from "obsidian";
 import * as React from "react";
 import { createRoot, Root } from "react-dom/client";
 import { TimelineView } from "./TimelineView";
@@ -14,6 +14,7 @@ export interface DayTimeTrackerSettings {
     language: string;
     categories: CustomCategory[];
     themeMode: string;
+    dailyNoteFolder: string;
 }
 
 const DEFAULT_SETTINGS: DayTimeTrackerSettings = {
@@ -23,6 +24,7 @@ const DEFAULT_SETTINGS: DayTimeTrackerSettings = {
     language: "",
     categories: [],
     themeMode: "light",
+    dailyNoteFolder: "",
 };
 
 export default class DayTimeTrackerPlugin extends Plugin {
@@ -31,6 +33,18 @@ export default class DayTimeTrackerPlugin extends Plugin {
     async onload() {
         await this.loadSettings();
         this.updatePropertiesBlockClass();
+
+        // Re-apply once the workspace/document is fully ready, and again on every
+        // leaf switch, so the hidden state self-heals if it was lost on initial load
+        // (e.g. the properties DOM not being ready yet at plugin load time).
+        this.app.workspace.onLayoutReady(() => {
+            this.updatePropertiesBlockClass();
+        });
+        this.registerEvent(
+            this.app.workspace.on("active-leaf-change", () => {
+                this.updatePropertiesBlockClass();
+            })
+        );
 
         // Register the custom view creator
         this.registerView(
@@ -263,6 +277,19 @@ class DayTimeTrackerSettingTab extends PluginSettingTab {
             });
 
         new Setting(containerEl)
+            .setName(t("SETTING_DAILY_NOTE_FOLDER_NAME", lang))
+            .setDesc(t("SETTING_DAILY_NOTE_FOLDER_DESC", lang))
+            .addText((text) => {
+                text.setPlaceholder(t("SETTING_DAILY_NOTE_FOLDER_PLACEHOLDER", lang))
+                    .setValue(this.plugin.settings.dailyNoteFolder)
+                    .onChange(async (value) => {
+                        this.plugin.settings.dailyNoteFolder = value.trim();
+                        await this.plugin.saveSettings();
+                    });
+                new FolderSuggest(this.app, text.inputEl);
+            });
+
+        new Setting(containerEl)
             .setName(t("SETTING_HIDE_PROPERTIES_NAME", lang))
             .setDesc(t("SETTING_HIDE_PROPERTIES_DESC", lang))
             .addToggle((toggle) => {
@@ -442,5 +469,37 @@ class DayTimeTrackerSettingTab extends PluginSettingTab {
                         });
                 });
         }
+    }
+}
+
+class FolderSuggest extends AbstractInputSuggest<TFolder> {
+    constructor(app: App, private inputEl: HTMLInputElement) {
+        super(app, inputEl);
+        this.onSelect((folder) => {
+            this.setValue(folder.path === "/" ? "" : folder.path);
+            this.inputEl.trigger("input");
+            this.close();
+        });
+    }
+
+    getSuggestions(query: string): TFolder[] {
+        const lowerQuery = query.toLowerCase();
+        const folders: TFolder[] = [];
+        const collect = (folder: TFolder) => {
+            if (folder.path === "/" || folder.path.toLowerCase().contains(lowerQuery)) {
+                folders.push(folder);
+            }
+            folder.children.forEach((child) => {
+                if (child instanceof TFolder) {
+                    collect(child);
+                }
+            });
+        };
+        collect(this.app.vault.getRoot());
+        return folders;
+    }
+
+    renderSuggestion(folder: TFolder, el: HTMLElement): void {
+        el.setText(folder.path === "/" ? "/" : folder.path);
     }
 }
